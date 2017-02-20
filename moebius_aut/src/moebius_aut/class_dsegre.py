@@ -13,24 +13,26 @@ class DSegre( object ):
     This class represents the Segre embedding of P^2xP^2 
     restricted to CxC where C is the Veronese embedding 
     of P^1 into P^2. We refer to such a surface as the 
-    "double Segre surface" and it lives in P^8.
+    "double Segre surface" and it lives in projective 8-space P^8.
     The double Segre surface is the anticanonical model of a 
-    Del Pezzo surface of degree 8.    
+    Del Pezzo surface of degree 8.        
     '''
 
     @staticmethod
     def get_ideal_lst( exc_idx_lst = [], varname = 'x' ):
         '''
-        We consider a parametrization of double Segre surface
-        as provided by "get_pmz_lst". 
+        We consider a toric parametrization of double Segre surface
+        whose completion to P^1xP^1 is provided by "get_pmz_lst": 
         
+        (s,u)
+        |-->
         (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
         =
         (1:x1:x2:x3:x4:x5:x6:x7:x8)
         
         We can put the exponents of the monomials in a lattice
         where x0 corresponds to coordinate (0,0), x6 to (-1,-1)
-        x5 to (1,1) and x8 to (-1,1). 
+        x5 to (1,1) and x8 to (-1,1): 
                 
               x8 x3 x5
               x2 x0 x1
@@ -52,7 +54,7 @@ class DSegre( object ):
               of the double Segre surface.
               The ideal lives in a subring 
                   QQ[x0,...,x8] 
-              of the ring represented by "MARing".
+              of the ring represented by "MARing.R".
               For each index i in "exc_idx_lst" the 
               generators that contain xi are omitted.  
         '''
@@ -100,7 +102,7 @@ class DSegre( object ):
         '''
         OUTPUT:
             - Returns a list of polynomials of bidegree (2,2)
-              in the subring QQ[s,t;u,w] of the ring "MARing".
+              in the subring QQ[s,t;u,w] of the ring "MARing.R".
         '''
 
         s_lst = []
@@ -125,18 +127,22 @@ class DSegre( object ):
         The double Segre surface S is isomorphic to P^1xP^1.
         The following pair of 2x2 matrices denotes an automorphism 
         of P^1xP^1:
-              ( [ a b ]   [ e f ] ) 
+              ( [ a b ]   [ e f ] ) = (A,B)
               ( [ c d ] , [ g h ] )
         We compute the representation of this automorphism in P^8
         by using the parametrization as provided by ".get_pmz_lst".
         Since we consider the 2x2 matrix up to multiplication
         by a constant, the automorphism group is 6-dimensional.
         
+        Formally, this method computes Sym^2(A)@Sym^2(B) 
+        where @ denotes the tensor product (otimes in tex).
+    
+        
         OUTPUT:
             - Returns a matrix with entries in the fraction field
-              QQ(a,b,c,d,e,f,g,h). This parametrized matrix represents
-              automorphisms of P^8 that preserve the double Segre 
-              surface.  
+              QQ(a,b,c,d,e,f,g,h) (see MARing.FF). 
+              This parametrized matrix represents automorphisms 
+              of P^8 that preserve the double Segre surface S.  
         '''
 
         x0, x1, y0, y1 = ring( 'x0,x1,y0,y1' )
@@ -169,19 +175,19 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_qmat_qpol():
+    def get_qmat():
         '''
         OUTPUT:
-            - Returns a matrix and a quadric polynomial.
-              
-              * The matrix consists 
-              
-              
+            - Returns a symmetric 9x9 matrix with entries
+              in the ring QQ[q0,...,q19] which is a subring 
+              of "MARing.R". It represents the Gramm matrix 
+              of a quadratic form in the ideal of the 
+              double Segre surface.              
         '''
         x = MARing.x()
         q = MARing.q()
 
-        g_lst = DASegre.get_ideal_lst()
+        g_lst = DSegre.get_ideal_lst()
         qpol = 0
         for i in range( len( g_lst ) ):
             qpol += q[i] * g_lst[i]
@@ -189,23 +195,82 @@ class DSegre( object ):
         qmat = invariant_theory.quadratic_form( qpol, x ).as_QuadraticForm().matrix()
         qmat = Matrix( MARing.R, qmat )
 
-        return qmat, qpol
+        return qmat
 
 
-    def get_sig( pol ):
-
-        x = AutRing.x()
-
-        M = invariant_theory.quadratic_form( pol, x ).as_QuadraticForm().matrix()
-        M = matrix( QQ, M )
-        D, V = M.eigenmatrix_right()  # D has first all negative values on diagonal
-
-        # determine signature of quadric
+    @staticmethod
+    def get_invariant_q_lst( c_lst ):
+        '''                        
+        INPUT: 
+            -- "c_lst" - A list of length 8 with 
+                         elements c0,...,c7 in QQ(k), 
+                         where QQ(k) is a subfield of "MARing.FF".
+                         If we substitute k:=0 in the entries of 
+                         "c_lst" then we should obtain the list:
+                             [1,0,0,1,1,0,0,1].
+                                     
+        OUTPUT:
+            -- Let H be the representation of the pair
+               of matrices  
+                    ( [ c0 c1 ]   [ c4 c5 ] ) 
+                    ( [ c2 c3 ] , [ c6 c7 ] )
+               into P^8 (see also ".get_aut_P8()").
+               We assume here that H is an element
+               in Aut(P^1xP^1) and normalized so that
+               each 2x2 matrix has determinant 1.
+                
+               Thus H corresponds to a 1-parameter subgroup
+               of Aut(P^8), such that each automorphism preserves 
+               the double Segre surface S in projective 8-space P^8.
+               
+               This method returns the Groebner basis  
+               of an ideal I in the subring QQ[q0,...,q19] 
+               of "MARing.R". Each point p in the zeroset V(I)
+               substituted in the matrix ".get_qmat()"
+               defines a quadratic form in the ideal ".get_ideal_lst()"
+               that is preserved by the 1-parameter subgroup H.                                        
+        '''
+        # create a dictionary for substitution
         #
-        num_neg = len( [ d for d in D.diagonal() if d < 0 ] )
-        num_pos = len( [ d for d in D.diagonal() if d > 0 ] )
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        k = ring( 'k' )
+        c0, c1, c2, c3, c4, c5, c6, c7 = c_lst
+        dct = {a:c0, b:c1, c:c2, d:c3, e:c4, f:c5, g:c6, h:c7}
 
-        return ( num_neg, num_pos )
+        # get representation of 1-parameter subgroup in Aut(P^8)
+        #
+        H = DSegre.get_aut_P8().subs( dct )
+
+        # consider the tangent vector of the curve H at the identity
+        #
+        D = MARing.diff_mat( H, k ).subs( {k:0} )
+
+        # Note that if we differentiate the condition
+        # A=H.T*A*H on both sides, evalute k=0, then
+        # we obtain the condition D.T * A + A * D=0.
+        # Here A denotes the matrix of a quadratic form
+        # in the ideal of the double Segre surface S.
+        #
+        A = DSegre.get_qmat()
+        Z = D.T * A + A * D
+        gb_lst = list( MARing.R.ideal( Z.list() ).groebner_basis() )
+
+        return gb_lst
 
 
+    def get_invariant_ideal( c_lst_lst ):
+        '''
+        INPUT:
+            -- "c_lst_lst" - A list of lists c_lst, such that c_lst is 
+                             a list of length 8 with 
+                             elements c0,...,c7 in QQ(k), 
+                             where QQ(k) is a subfield of "MARing.FF".
+                             If we substitute k:=0 in the entries of 
+                             "c_lst" then we should obtain the list:
+                             [1,0,0,1,1,0,0,1].
+        OUTPUT:
+            -- Quadratic forms in the ideal of the double Segre surface S,
+               such that the quadratic forms are invariant under the automorphisms
+               of S as defined by "c_lst_lst".  
+        '''
 

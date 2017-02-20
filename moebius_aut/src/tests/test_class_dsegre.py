@@ -7,7 +7,8 @@ from sage.all import *
 
 from moebius_aut.class_dsegre import DSegre
 from moebius_aut.class_ma_ring import ring
-# from moebius_aut.class_ma_ring import MARing
+from moebius_aut.class_ma_ring import MARing
+
 
 class TestClassDSegre:
 
@@ -49,10 +50,60 @@ class TestClassDSegre:
         out = DSegre.get_aut_P8()
         print( list( out ) )
         print( out )
-        assert False
         assert out == ring( chk_mat )
 
 
+    def test__qmat( self ):
+        chk_mat = ''
+        chk_mat += '['
+        chk_mat += '(q0 + q1 + q2 + q3, 1/2*q8 + 1/2*q12, 1/2*q9 + 1/2*q13, 1/2*q10 + 1/2*q14, 1/2*q11 + 1/2*q15, 1/2*q16, 1/2*q17, 1/2*q18, 1/2*q19),'
+        chk_mat += '(1/2*q8 + 1/2*q12, q4, (-1/2)*q0, (-1/2)*q16, (-1/2)*q18, 0, (-1/2)*q11, 0, (-1/2)*q14),'
+        chk_mat += '(1/2*q9 + 1/2*q13, (-1/2)*q0, q5, (-1/2)*q19, (-1/2)*q17, (-1/2)*q10, 0, (-1/2)*q15, 0),'
+        chk_mat += '(1/2*q10 + 1/2*q14, (-1/2)*q16, (-1/2)*q19, q6, (-1/2)*q1, 0, (-1/2)*q9, (-1/2)*q12, 0),'
+        chk_mat += '(1/2*q11 + 1/2*q15, (-1/2)*q18, (-1/2)*q17, (-1/2)*q1, q7, (-1/2)*q8, 0, 0, (-1/2)*q13),'
+        chk_mat += '(1/2*q16, 0, (-1/2)*q10, 0, (-1/2)*q8, 0, (-1/2)*q2, (-1/2)*q4, (-1/2)*q6),'
+        chk_mat += '(1/2*q17, (-1/2)*q11, 0, (-1/2)*q9, 0, (-1/2)*q2, 0, (-1/2)*q7, (-1/2)*q5),'
+        chk_mat += '(1/2*q18, 0, (-1/2)*q15, (-1/2)*q12, 0, (-1/2)*q4, (-1/2)*q7, 0, (-1/2)*q3),'
+        chk_mat += '(1/2*q19, (-1/2)*q14, 0, 0, (-1/2)*q13, (-1/2)*q6, (-1/2)*q5, (-1/2)*q3, 0)'
+        chk_mat += ']'
+        chk_mat = 'matrix(' + chk_mat + ')'
+
+        qmat = DSegre.get_qmat()
+        for row in qmat:
+            print( row )
+        assert qmat == ring( chk_mat )
+
+
+    def test__qmat__symmetric( self ):
+        qmat = DSegre.get_qmat()
+        print( qmat )
+        assert qmat == qmat.T
+
+
+    def test__qmat__qpol( self ):
+        x = MARing.x()
+        q = MARing.q()
+
+        g_lst = DSegre.get_ideal_lst()
+        chk_qpol = 0
+        for i in range( len( g_lst ) ):
+            chk_qpol += q[i] * g_lst[i]
+
+        qmat = DSegre.get_qmat()
+        qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
+        assert qpol == chk_qpol
+
+
+    def test__get_invariant_q_lst( self ):
+        k = ring( 'k' )
+
+        ig_lst = DSegre.get_invariant_q_lst( [k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1] )
+        print( ig_lst )
+        assert ig_lst == ring( '[q4, q5, q8, q9, q12, q13, q16, q17, q18, q19]' )
+
+        ig_lst = DSegre.get_invariant_q_lst( [1, k, 0, 1, 1, 0, 0, 1] )
+        print( ig_lst )
+        assert ig_lst == ring( '[q1 + 2*q3, q2 - q3, q4, q8, q9 + q13, q10 - q14, q11 - q15, q12, q16, q18]' )
 
 
 
