@@ -3,8 +3,6 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Feb 17, 2017
 @author: Niels Lubbes
 '''
-from nose import with_setup  # optional
-
 from sage.all import *
 from moebius_aut.class_ma_tools import MATools
 
