@@ -6,13 +6,15 @@ Created on Feb 17, 2017
 from sage.all import *
 
 from class_ma_tools import MATools
+from class_ma_ring import ring
+from class_ma_ring import MARing
+from class_dsegre import DSegre
 
-ma = MATools()
+mt = MATools()
 
 if __name__ == '__main__':
 
-    ma.p( 'test' )
-
+    mt.p( 'test' )
     print
     print( 'The End' )
 

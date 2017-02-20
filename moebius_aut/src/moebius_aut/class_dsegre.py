@@ -4,8 +4,11 @@ Created on Feb 20, 2017
 @author: Niels Lubbes
 '''
 from sage.all import *
+
+from class_ma_tools import MATools
 from class_ma_ring import ring
 from class_ma_ring import MARing
+
 
 
 class DSegre( object ):
@@ -212,8 +215,10 @@ class DSegre( object ):
         OUTPUT:
             -- Let H be the representation of the pair
                of matrices  
+               
                     ( [ c0 c1 ]   [ c4 c5 ] ) 
                     ( [ c2 c3 ] , [ c6 c7 ] )
+               
                into P^8 (see also ".get_aut_P8()").
                We assume here that H is an element
                in Aut(P^1xP^1) and normalized so that
@@ -223,10 +228,12 @@ class DSegre( object ):
                of Aut(P^8), such that each automorphism preserves 
                the double Segre surface S in projective 8-space P^8.
                
-               This method returns the Groebner basis  
-               of an ideal I in the subring QQ[q0,...,q19] 
-               of "MARing.R". Each point p in the zeroset V(I)
-               substituted in the matrix ".get_qmat()"
+               This method returns a list of generators 
+               of an ideal J in the subring QQ[q0,...,q19] 
+               of "MARing.R". 
+               
+               Each point p in the zeroset V(J),
+               when substituted in the matrix ".get_qmat()",
                defines a quadratic form in the ideal ".get_ideal_lst()"
                that is preserved by the 1-parameter subgroup H.                                        
         '''
@@ -253,11 +260,11 @@ class DSegre( object ):
         #
         A = DSegre.get_qmat()
         Z = D.T * A + A * D
-        gb_lst = list( MARing.R.ideal( Z.list() ).groebner_basis() )
 
-        return gb_lst
+        return Z.list()
 
 
+    @staticmethod
     def get_invariant_ideal( c_lst_lst ):
         '''
         INPUT:
@@ -269,8 +276,58 @@ class DSegre( object ):
                              "c_lst" then we should obtain the list:
                              [1,0,0,1,1,0,0,1].
         OUTPUT:
-            -- Quadratic forms in the ideal of the double Segre surface S,
-               such that the quadratic forms are invariant under the automorphisms
-               of S as defined by "c_lst_lst".  
+            -- A list of quadratic forms in the ideal of the double Segre 
+               surface S, such that the quadratic forms are invariant 
+               under the automorphisms of S as defined by "c_lst_lst"
+               and such that the quadratic forms generate the ideal of  
+               all invariant quadratic forms.   
+               
+               For the ideal of all quadratic forms see ".get_ideal_lst()" 
         '''
+        # initialize vectors for indeterminates of "MARing.R"
+        #
+        x = MARing.x()
+        q = MARing.q()
+        r = MARing.r()
+
+        # obtain algebraic conditions on q0,...,q19
+        # so that the associated quadratic form is invariant
+        # wrt. the automorphism defined by input "c_lst_lst"
+        #
+        iq_lst = []
+        for c_lst in c_lst_lst:
+            iq_lst += DSegre.get_invariant_q_lst( c_lst )
+        iq_lst = list( MARing.R.ideal( iq_lst ).groebner_basis() )
+
+        # solve the ideal defined by "iq_lst"
+        # In order to use solve of Sage we cast to the symbolic ring "SR".
+        #
+        sol_dct = solve( [SR( str( iq ) ) for iq in iq_lst], [var( str( qi ) ) for qi in q], solution_dict = True )
+        sol_dct = ring( sol_dct )[0]
+
+        # substitute the solution in the quadratic form
+        # associated to "get_q_mat()".
+        #
+        qmat = DSegre.get_qmat()
+        qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
+        sqpol = qpol.subs( sol_dct )
+        iqf_lst = []  # iqf=invariant quadratic form
+        for i in range( len( r ) ):
+            coef = sqpol.coefficient( r[i] )
+            if coef != 0:
+                iqf_lst += [ coef ]
+
+        # verbose output
+        #
+        mt = MATools()
+        mt.p( 'sqpol   =', sqpol )
+        mt.p( 'iqf_lst =', iqf_lst )
+
+        return iqf_lst
+
+
+
+
+
+
 
