@@ -125,7 +125,7 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_aut_P8():
+    def get_aut_P8( c_lst = None ):
         '''
         The double Segre surface S is isomorphic to P^1xP^1.
         The following pair of 2x2 matrices denotes an automorphism 
@@ -135,37 +135,49 @@ class DSegre( object ):
         We compute the representation of this automorphism in P^8
         by using the parametrization as provided by ".get_pmz_lst".
         Since we consider the 2x2 matrix up to multiplication
-        by a constant, the automorphism group is 6-dimensional.
-        
+        by a constant, the automorphism group is 6-dimensional.        
         Formally, this method computes Sym^2(A)@Sym^2(B) 
         where @ denotes the tensor product (otimes in tex).
-    
-        
+
+        INPUT: 
+            -- "c_lst" - Either None, or a list of length 8 with 
+                         elements c0,...,c7 in "MARing.FF". We 
+                         assume that the pair of matrices                                                                                 
+                            ( [ c0 c1 ]   [ c4 c5 ] ) = (C,D) 
+                            ( [ c2 c3 ] , [ c6 c7 ] )
+                         represent an automorphism of P^1xP^1
+                         such that both matrices are normalized 
+                         to have determinant 1. 
+                                                             
         OUTPUT:
-            - Returns a matrix with entries in the fraction field
-              QQ(a,b,c,d,e,f,g,h) (see MARing.FF). 
-              This parametrized matrix represents automorphisms 
-              of P^8 that preserve the double Segre surface S.  
+            - This method returns a 9x9 matrix defined over "MARing.FF",
+              which represents a (parametrized) automorphism of P^8
+              that preserves the double Segre surface S. 
+            
+              Returns Sym^2(A)@Sym^2(B) if "c_lst==None".
+              Returns Sym^2(C)@Sym^2(D) if "c_lst!=None".                                
         '''
-
-        x0, x1, y0, y1 = ring( 'x0,x1,y0,y1' )
-        a, b, c, d, e, f, g, h = ring( 'a,b,c,d,e,f,g,h' )
-        s, t, u, w = ring( 's,t,u,w' )  # coordinates of P^1xP^1
-
+        # obtain parametrization in order to compute Sym^2(?)@Sym^2(?)
+        #
         pmz_lst = DSegre.get_pmz_lst()
 
         # compute automorphisms double Segre surface
         #
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        x0, x1, y0, y1 = ring( 'x0,x1,y0,y1' )
+        s, t, u, w = ring( 's,t,u,w' )  # coordinates of P^1xP^1
         dct1a = {}
         dct1a.update( {s:a * x0 + b * x1} )
         dct1a.update( {t:c * x0 + d * x1} )
         dct1a.update( {u:e * y0 + f * y1} )
         dct1a.update( {w:g * y0 + h * y1} )
-
-        dct1b = {x0:s, x1:t, y0:u, y1:w}
         spmz_lst = [ pmz.subs( dct1a ) for pmz in pmz_lst]
+        dct1b = {x0:s, x1:t, y0:u, y1:w}
         spmz_lst = [ spmz.subs( dct1b ) for spmz in spmz_lst]
 
+        # compute matrix from reparametrization "spmz_lst"
+        # this is a representation of element in Aut(P^1xP^1)
+        #
         mat = []
         for spmz in spmz_lst:
             row = []
@@ -173,6 +185,13 @@ class DSegre( object ):
                 row += [spmz.coefficient( pmz )]
             mat += [row]
         mat = matrix( MARing.FF, mat )
+
+        # substitute
+        #
+        if c_lst != None:
+            c0, c1, c2, c3, c4, c5, c6, c7 = c_lst
+            subs_dct = {a:c0, b:c1, c:c2, d:c3, e:c4, f:c5, g:c6, h:c7}
+            mat = mat.subs( subs_dct )
 
         return mat
 
@@ -237,19 +256,13 @@ class DSegre( object ):
                defines a quadratic form in the ideal ".get_ideal_lst()"
                that is preserved by the 1-parameter subgroup H.                                        
         '''
-        # create a dictionary for substitution
-        #
-        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
-        k = ring( 'k' )
-        c0, c1, c2, c3, c4, c5, c6, c7 = c_lst
-        dct = {a:c0, b:c1, c:c2, d:c3, e:c4, f:c5, g:c6, h:c7}
-
         # get representation of 1-parameter subgroup in Aut(P^8)
         #
-        H = DSegre.get_aut_P8().subs( dct )
+        H = DSegre.get_aut_P8( c_lst )
 
         # consider the tangent vector of the curve H at the identity
         #
+        k = ring( 'k' )
         D = MARing.diff_mat( H, k ).subs( {k:0} )
 
         # Note that if we differentiate the condition
@@ -260,29 +273,35 @@ class DSegre( object ):
         #
         A = DSegre.get_qmat()
         Z = D.T * A + A * D
+        iq_lst = [iq for iq in Z.list() if iq != 0 ]
 
-        return Z.list()
+        return iq_lst
 
 
     @staticmethod
-    def get_invariant_ideal( c_lst_lst ):
+    def get_invariant_ideal( c_lst_lst, change_basis = True ):
         '''
         INPUT:
-            -- "c_lst_lst" - A list of lists c_lst, such that c_lst is 
-                             a list of length 8 with 
-                             elements c0,...,c7 in QQ(k), 
-                             where QQ(k) is a subfield of "MARing.FF".
-                             If we substitute k:=0 in the entries of 
-                             "c_lst" then we should obtain the list:
-                             [1,0,0,1,1,0,0,1].
+            -- "c_lst_lst"    - A list of lists c_lst, such that c_lst is 
+                                a list of length 8 with 
+                                elements c0,...,c7 in QQ(k), 
+                                where QQ(k) is a subfield of "MARing.FF".
+                                If we substitute k:=0 in the entries of 
+                                "c_lst" then we should obtain the list:
+                                [1,0,0,1,1,0,0,1].
+            -- "change_basis" - A boolean. 
         OUTPUT:
             -- A list of quadratic forms in the ideal of the double Segre 
                surface S, such that the quadratic forms are invariant 
                under the automorphisms of S as defined by "c_lst_lst"
                and such that the quadratic forms generate the ideal of  
                all invariant quadratic forms.   
+                           
+               For the ideal of all quadratic forms see ".get_ideal_lst()".
                
-               For the ideal of all quadratic forms see ".get_ideal_lst()" 
+               If "change_basis==True" then the generators of the 
+               invariant ideal are returned wrt. new coordinates,
+               see ".change_basis()". 
         '''
         # initialize vectors for indeterminates of "MARing.R"
         #
@@ -323,11 +342,33 @@ class DSegre( object ):
         mt.p( 'sqpol   =', sqpol )
         mt.p( 'iqf_lst =', iqf_lst )
 
-        return iqf_lst
+        if change_bases:
+            return DSegre.change_basis( iqf_lst )
+        else:
+            return iqf_lst
 
 
+    def change_basis( iqf_lst ):
+        '''
+        INPUT:
+            - A list of elements in "MARing.R".                          
+        OUTPUT:
+            - The elements of the input list wrt. a new 
+              basis.               
+        '''
 
+        I = ring( 'I' )
+        x = x0, x1, x2, x3, x4, x5, x6, x7, x8 = MARing.x()
+        z = z0, z1, z2, z3, z4, z5, z6, z7, z8 = MARing.z()
 
+        dct1 = { x0:z0,
+                 x1:z1 + I * z2, x2:z1 - I * z2,
+                 x3:z3 + I * z4, x4:z3 - I * z4,
+                 x5:z5 + I * z6, x6:z5 - I * z6,
+                 x7:z7 + I * z8, x8:z7 - I * z8 }
+        dct2 = { z[i]:x[i] for i in range( 8 ) }
 
+        new_lst = [ iqf.subs( dct1 ).subs( dct2 ) for iqf in iqf_lst ]
 
+        return new_lst
 

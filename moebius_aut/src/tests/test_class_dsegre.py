@@ -31,7 +31,7 @@ class TestClassDSegre:
         assert len( out ) == 9
 
 
-    def test__get_aut_P8( self ):
+    def test__get_aut_P8__None( self ):
         chk_mat = ''
         chk_mat += '['
         chk_mat += '(b*c*f*g + a*d*f*g + b*c*e*h + a*d*e*h, a*c*f*g + a*c*e*h, b*d*f*g + b*d*e*h, b*c*e*g + a*d*e*g, b*c*f*h + a*d*f*h, a*c*e*g, b*d*f*h, a*c*f*h, b*d*e*g),'
@@ -51,6 +51,29 @@ class TestClassDSegre:
         print( list( out ) )
         print( out )
         assert out == ring( chk_mat )
+
+
+    def test__get_aut_P8__SO2xID( self ):
+        chk_mat = ''
+        chk_mat += '['
+        chk_mat += '(1, 0, 0, 0, 0, 0, 0, 0, 0),'
+        chk_mat += '(0, k^2 + 2*k + 1, 0, 0, 0, 0, 0, 0, 0),'
+        chk_mat += '(0, 0, 1/(k^2 + 2*k + 1), 0, 0, 0, 0, 0, 0),'
+        chk_mat += '(0, 0, 0, 1, 0, 0, 0, 0, 0),'
+        chk_mat += '(0, 0, 0, 0, 1, 0, 0, 0, 0),'
+        chk_mat += '(0, 0, 0, 0, 0, k^2 + 2*k + 1, 0, 0, 0),'
+        chk_mat += '(0, 0, 0, 0, 0, 0, 1/(k^2 + 2*k + 1), 0, 0),'
+        chk_mat += '(0, 0, 0, 0, 0, 0, 0, k^2 + 2*k + 1, 0),'
+        chk_mat += '(0, 0, 0, 0, 0, 0, 0, 0, 1/(k^2 + 2*k + 1))'
+        chk_mat += ']'
+        chk_mat = 'matrix(' + chk_mat + ')'
+
+        k = ring( 'k' )
+        out = DSegre.get_aut_P8( [k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1] )
+        print( list( out ) )
+        print( out )
+        t = ( k + 1 ) ** 2
+        assert out == diagonal_matrix( [1, t, 1 / t, 1, 1, t, 1 / t, t, 1 / t ] )
 
 
     def test__qmat( self ):
@@ -99,24 +122,25 @@ class TestClassDSegre:
 
         ig_lst = DSegre.get_invariant_q_lst( [k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1] )
         print( ig_lst )
-        assert ig_lst == ring( '[q4, q5, q8, q9, q12, q13, q16, q17, q18, q19]' )
+        assert ig_lst == ring( '[q8 + q12, -q9 - q13, q16, -q17, q18, -q19, q8 + q12, 4*q4, -q16, -q18, -q9 - q13, (-4)*q5, q19, q17, -q16, q19, q9, -q12, -q18, q17, -q8, q13, q16, -q8, (-2)*q4, -q17, q9, 2*q5, q18, -q12, (-2)*q4, -q19, q13, 2*q5]' )
 
         ig_lst = DSegre.get_invariant_q_lst( [1, k, 0, 1, 1, 0, 0, 1] )
         print( ig_lst )
-        assert ig_lst == ring( '[q1 + 2*q3, q2 - q3, q4, q8, q9 + q13, q10 - q14, q11 - q15, q12, q16, q18]' )
+        assert ig_lst == ring( '[2*q8 + 2*q12, 2*q4, q1 + q2 + q3, (-1/2)*q11 + 1/2*q15, 1/2*q10 + (-1/2)*q14, 2*q4, 1/2*q8 + 1/2*q12, (-1/2)*q18, (-1/2)*q16, q1 + q2 + q3, 1/2*q8 + 1/2*q12, q9 + q13, (-1/2)*q10 + 1/2*q14, 1/2*q11 + (-1/2)*q15, 1/2*q16, 1/2*q18, (-1/2)*q10 + 1/2*q14, -q8 - q12, (-1/2)*q1 - q2, -q4, 1/2*q11 + (-1/2)*q15, -q8 - q12, -q4, (-1/2)*q1 - q3, 1/2*q16, -q4, (-1/2)*q8, (-1/2)*q11 + 1/2*q15, (-1/2)*q18, (-1/2)*q1 - q2, (-1/2)*q8, (-1/2)*q9 + (-1/2)*q13, 1/2*q18, -q4, (-1/2)*q12, 1/2*q10 + (-1/2)*q14, (-1/2)*q16, (-1/2)*q1 - q3, (-1/2)*q9 + (-1/2)*q13, (-1/2)*q12]' )
 
 
-    def test__get_invariant_ideal__SO2xSO2( self ):
+    def test__get_invariant_ideal__SO2xSO2_False( self ):
         k = ring( 'k' )
         c_lst_lst = []
         c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
         c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
 
-        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst )
+        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst, False )
         print( iqf_lst )
         assert iqf_lst == ring( '[x0^2 - x7*x8, x0^2 - x5*x6, x0^2 - x3*x4, x0^2 - x1*x2]' )
 
-
+    def test__change_basis( self ):
+        pass
 
 
 
