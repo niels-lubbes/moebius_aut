@@ -34,9 +34,3 @@ class TestMARing:
         assert dmat == matrix( MARing.FF, [( 1, 0 ), ( 0, -1 / a ** 2 )] )
 
 
-
-
-
-
-
-

@@ -49,6 +49,7 @@ class MATools():
         MATools.__filter_fname = filter_fname
         MATools.__prev_filter_fname = filter_fname
 
+
     @staticmethod
     def filter_unset():
         '''
@@ -56,12 +57,14 @@ class MATools():
         '''
         MATools.__filter_fname = None
 
+
     @staticmethod
     def filter_reset():
         '''
         Resets filter state to before previous ".filter_unset()" call.
         '''
         MATools.__filter_fname = MATools.__prev_filter_fname
+
 
     @staticmethod
     def p( *arg_lst ):
@@ -107,6 +110,7 @@ class MATools():
     @staticmethod
     def set_enable_tool_dct( enable_tool_dct ):
         MATools.__enable_tool_dct = enable_tool_dct
+
 
     @staticmethod
     def get_tool_dct( fname = 'ma_tools' ):
@@ -187,7 +191,7 @@ class MATools():
 
 
     @staticmethod
-    def end_timer():
+    def stop_timer():
         '''
         OUTPUT:
             - Prints time passed since last call of ".start_timer()".

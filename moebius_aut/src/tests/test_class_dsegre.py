@@ -25,6 +25,36 @@ class TestClassDSegre:
         assert out == ring( chk_str )
 
 
+    def test__change_basis( self ):
+        qf_lst = DSegre.get_ideal_lst()
+        nqf_lst = DSegre.change_basis( qf_lst )
+
+        chk_lst = '['
+        chk_lst += 'x0^2 - x1^2 - x2^2,'
+        chk_lst += 'x0^2 - x3^2 - x4^2,'
+        chk_lst += 'x0^2 - x5^2 - x6^2,'
+        chk_lst += 'x0^2 - x7^2 - x8^2,'
+        chk_lst += 'x1^2 + 2*I*x1*x2 - x2^2 - x5*x7 - I*x6*x7 - I*x5*x8 + x6*x8,'
+        chk_lst += 'x1^2 - 2*I*x1*x2 - x2^2 - x5*x7 + I*x6*x7 + I*x5*x8 + x6*x8,'
+        chk_lst += 'x3^2 + 2*I*x3*x4 - x4^2 - x5*x7 - I*x6*x7 + I*x5*x8 - x6*x8,'
+        chk_lst += 'x3^2 - 2*I*x3*x4 - x4^2 - x5*x7 + I*x6*x7 - I*x5*x8 - x6*x8,'
+        chk_lst += 'x0*x1 + I*x0*x2 - x3*x5 + I*x4*x5 - I*x3*x6 - x4*x6,'
+        chk_lst += 'x0*x1 - I*x0*x2 - x3*x5 - I*x4*x5 + I*x3*x6 - x4*x6,'
+        chk_lst += 'x0*x3 + I*x0*x4 - x1*x5 + I*x2*x5 - I*x1*x6 - x2*x6,'
+        chk_lst += 'x0*x3 - I*x0*x4 - x1*x5 - I*x2*x5 + I*x1*x6 - x2*x6,'
+        chk_lst += 'x0*x1 + I*x0*x2 - x3*x7 - I*x4*x7 - I*x3*x8 + x4*x8,'
+        chk_lst += 'x0*x1 - I*x0*x2 - x3*x7 + I*x4*x7 + I*x3*x8 + x4*x8,'
+        chk_lst += 'x0*x3 + I*x0*x4 - x1*x7 - I*x2*x7 + I*x1*x8 - x2*x8,'
+        chk_lst += 'x0*x3 - I*x0*x4 - x1*x7 + I*x2*x7 - I*x1*x8 - x2*x8,'
+        chk_lst += '-x1*x3 - I*x2*x3 - I*x1*x4 + x2*x4 + x0*x5 + I*x0*x6,'
+        chk_lst += '-x1*x3 + I*x2*x3 + I*x1*x4 + x2*x4 + x0*x5 - I*x0*x6,'
+        chk_lst += '-x1*x3 - I*x2*x3 + I*x1*x4 - x2*x4 + x0*x7 + I*x0*x8,'
+        chk_lst += '-x1*x3 + I*x2*x3 - I*x1*x4 - x2*x4 + x0*x7 - I*x0*x8'
+        chk_lst += ']'
+
+        assert nqf_lst == ring( chk_lst )
+
+
     def test__get_pmz_lst( self ):
         out = DSegre.get_pmz_lst()
         print( out )
@@ -139,12 +169,47 @@ class TestClassDSegre:
         print( iqf_lst )
         assert iqf_lst == ring( '[x0^2 - x7*x8, x0^2 - x5*x6, x0^2 - x3*x4, x0^2 - x1*x2]' )
 
-    def test__change_basis( self ):
-        pass
+
+    def test__get_invariant_ideal__SO2xSO2_True( self ):
+        k = ring( 'k' )
+        c_lst_lst = []
+        c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
+        c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
+
+        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst, True )
+        print( iqf_lst )
+        assert iqf_lst == ring( '[x0^2 - x7^2 - x8^2, x0^2 - x5^2 - x6^2, x0^2 - x3^2 - x4^2, x0^2 - x1^2 - x2^2]' )
 
 
+    def test__get_c_lst_lst_dct( self ):
+        k = ring( 'k' )
+        c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
+        for key in c_lst_lst_dct:
+            for c_lst_lst in c_lst_lst_dct[key]:
+                assert len( c_lst_lst ) == key
+                for c_lst in c_lst_lst:
+                    assert len( c_lst ) == 8
+                    # evaluate at k=0
+                    n_lst = []
+                    for c in c_lst:
+                        if c in ZZ:
+                            n_lst += [ c ]
+                        else:
+                            n_lst += [c.subs( {k:0} ) ]
+                    print( n_lst )
+                    assert n_lst == [1, 0, 0, 1, 1, 0, 0, 1]
+                    for c in c_lst:
+                        assert c in MARing.FF
 
 
+    def test__to_str( self ):
 
+        c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
+        s = '[ '
+        for c_lst_lst in c_lst_lst_dct[2]:
+             s += DSegre.to_str( c_lst_lst ) + ', '
+        s = s[:-2] + ' ]'
+        print( s )
+        assert s == '[ < g1, g3 >, < g1, t1 >, < g1, t3 >, < g3, t3 >, < g1xt3, t1 >, < g3xt3, t1 >, < g1xt1, g3xt3 > ]'
 
 

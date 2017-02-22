@@ -5,6 +5,8 @@ Created on Nov 21, 2016
 '''
 from sage.all import *
 
+from class_ma_tools import MATools
+
 def ring( s ):
     return MARing.ring( s )
 
@@ -12,9 +14,9 @@ class MARing:
     '''
     This class represents a polynomial ring over a fraction field:
     
-        FF[s,t,u,w,x#,y#,z#,q#,r#]
+        FF[s,t,u,w,x#,y#,z#,q#,r%]
     
-    where # is in [0,19] and 
+    where # is in [0,19] and % is in [0,100]
     
         FF := NF(a,b,c,d,e,f,g,h,k) 
     and
@@ -36,7 +38,7 @@ class MARing:
     vz_lst = [ 'z' + str( i ) for i in range( 9 )]
     vs_lst = ['s', 't', 'u', 'w']
     vq_lst = [ 'q' + str( i ) for i in range( 20 ) ]
-    vr_lst = [ 'r' + str( i ) for i in range( 20 ) ]
+    vr_lst = [ 'r' + str( i ) for i in range( 100 ) ]
 
     R = PolynomialRing( FF, vx_lst + vy_lst + vz_lst + vs_lst + vq_lst + vr_lst )
 
@@ -69,7 +71,7 @@ class MARing:
 
     @staticmethod
     def r():
-        return MARing.ring( 'r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19' )
+        return MARing.ring( [ring( 'r' + str( i ) ) for i in range( 100 )] )
 
 
     @staticmethod

@@ -21,6 +21,12 @@ class DSegre( object ):
     Del Pezzo surface of degree 8.        
     '''
 
+    # private static dictionary for translating
+    # c_lst_lst to a string representation (see ".to_str"())
+    #
+    __str_dct = {}
+
+
     @staticmethod
     def get_ideal_lst( exc_idx_lst = [], varname = 'x' ):
         '''
@@ -98,6 +104,33 @@ class DSegre( object ):
         e_lst = [ ring( s ) for s in s_lst ]
 
         return e_lst
+
+
+    @staticmethod
+    def change_basis( iqf_lst ):
+        '''
+        INPUT:
+            - A list of elements in "MARing.R".                          
+        OUTPUT:
+            - The elements of the input list wrt. a new basis. 
+              In this new basis an antiholomorphic involution
+              coincides with complex conjugation.                                           
+        '''
+
+        I = ring( 'I' )
+        x = x0, x1, x2, x3, x4, x5, x6, x7, x8 = MARing.x()
+        z = z0, z1, z2, z3, z4, z5, z6, z7, z8 = MARing.z()
+
+        dct1 = { x0:z0,
+                 x1:z1 + I * z2, x2:z1 - I * z2,
+                 x3:z3 + I * z4, x4:z3 - I * z4,
+                 x5:z5 + I * z6, x6:z5 - I * z6,
+                 x7:z7 + I * z8, x8:z7 - I * z8 }
+        dct2 = { z[i]:x[i] for i in range( 9 ) }
+
+        new_lst = [ iqf.subs( dct1 ).subs( dct2 ) for iqf in iqf_lst ]
+
+        return new_lst
 
 
     @staticmethod
@@ -224,12 +257,17 @@ class DSegre( object ):
     def get_invariant_q_lst( c_lst ):
         '''                        
         INPUT: 
-            -- "c_lst" - A list of length 8 with 
-                         elements c0,...,c7 in QQ(k), 
+            -- "c_lst" - A list of length 8 with elements 
+                         c0,...,c7 in QQ(k), 
                          where QQ(k) is a subfield of "MARing.FF".
                          If we substitute k:=0 in the entries of 
                          "c_lst" then we should obtain the list:
-                             [1,0,0,1,1,0,0,1].
+                                [1,0,0,1,1,0,0,1].                                                                                  
+                         A c_lst represents a pair of two matrices:                                
+                            ( [ c0 c1 ]   [ c4 c5 ] ) 
+                            ( [ c2 c3 ] , [ c6 c7 ] )                                   
+                         with the property that 
+                             c0*c3-c1*c2=c4*c7-c5*c6=1.   
                                      
         OUTPUT:
             -- Let H be the representation of the pair
@@ -279,17 +317,24 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_invariant_ideal( c_lst_lst, change_basis = True ):
+    def get_invariant_ideal( c_lst_lst, basis_change = True ):
         '''
         INPUT:
-            -- "c_lst_lst"    - A list of lists c_lst, such that c_lst is 
-                                a list of length 8 with 
-                                elements c0,...,c7 in QQ(k), 
+            -- "c_lst_lst"    - A list of "c_lst"-lists.
+                                A c_lst is a list of length 8 with elements 
+                                c0,...,c7 in QQ(k), 
                                 where QQ(k) is a subfield of "MARing.FF".
                                 If we substitute k:=0 in the entries of 
                                 "c_lst" then we should obtain the list:
-                                [1,0,0,1,1,0,0,1].
-            -- "change_basis" - A boolean. 
+                                   [1,0,0,1,1,0,0,1].                                                                      
+                                A c_lst represents a pair of two matrices:                                
+                                   ( [ c0 c1 ]   [ c4 c5 ] ) 
+                                   ( [ c2 c3 ] , [ c6 c7 ] )                                   
+                                with the property that 
+                                    c0*c3-c1*c2=c4*c7-c5*c6=1.            
+            
+            
+            -- "basis_change" - A boolean. 
         OUTPUT:
             -- A list of quadratic forms in the ideal of the double Segre 
                surface S, such that the quadratic forms are invariant 
@@ -299,10 +344,15 @@ class DSegre( object ):
                            
                For the ideal of all quadratic forms see ".get_ideal_lst()".
                
-               If "change_basis==True" then the generators of the 
+               If "basis_change==True" then the generators of the 
                invariant ideal are returned wrt. new coordinates,
                see ".change_basis()". 
         '''
+
+        # for verbose output
+        #
+        mt = MATools()
+
         # initialize vectors for indeterminates of "MARing.R"
         #
         x = MARing.x()
@@ -322,6 +372,7 @@ class DSegre( object ):
         # In order to use solve of Sage we cast to the symbolic ring "SR".
         #
         sol_dct = solve( [SR( str( iq ) ) for iq in iq_lst], [var( str( qi ) ) for qi in q], solution_dict = True )
+        mt.p( 'sol_dct =', sol_dct )
         sol_dct = ring( sol_dct )[0]
 
         # substitute the solution in the quadratic form
@@ -330,45 +381,168 @@ class DSegre( object ):
         qmat = DSegre.get_qmat()
         qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
         sqpol = qpol.subs( sol_dct )
+        mt.p( 'sqpol   =', sqpol )
+        mt.p( 'r       =', r )
+        assert sqpol.subs( {ri:0 for ri in r} ) == 0
         iqf_lst = []  # iqf=invariant quadratic form
         for i in range( len( r ) ):
             coef = sqpol.coefficient( r[i] )
             if coef != 0:
                 iqf_lst += [ coef ]
-
-        # verbose output
-        #
-        mt = MATools()
-        mt.p( 'sqpol   =', sqpol )
         mt.p( 'iqf_lst =', iqf_lst )
 
-        if change_bases:
-            return DSegre.change_basis( iqf_lst )
-        else:
-            return iqf_lst
+        # change basis?
+        #
+        if basis_change:
+            iqf_lst = DSegre.change_basis( iqf_lst )
 
 
-    def change_basis( iqf_lst ):
+
+        return iqf_lst
+
+
+    @staticmethod
+    def get_c_lst_lst_dct():
         '''
-        INPUT:
-            - A list of elements in "MARing.R".                          
         OUTPUT:
-            - The elements of the input list wrt. a new 
-              basis.               
+              
+            - A c_lst is a list of length 8 with elements c0,...,c7 in QQ(k), 
+              where QQ(k) is a subfield of "MARing.FF".
+              If we substitute k:=0 in the entries of "c_lst" then we obtain 
+              the list:
+               
+                  [1,0,0,1,1,0,0,1].                                          
+              
+              A c_lst represents a pair of two matrices:
+              
+                 ( [ c0 c1 ]   [ c4 c5 ] ) 
+                 ( [ c2 c3 ] , [ c6 c7 ] )
+                 
+              with the property that c0*c3-c1*c2=c4*c7-c5*c6=1.
+              
+              This pair represent a 1-parameter subgroup G 
+              (with parameter k) in Aut(P^1xP^1).
+              Both matrices are normalized to have determinant 1 
+              and is the identity automorphism at k=0. 
+              
+              For example SO(2)xSO(2) in Aut(P^1xP^1) has two generators:
+              
+                c_lst_0 = [k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]
+                c_lst_1 = [1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]
+
+              We now define c_lst_lst = [c_lst_0, c_lst_1].
+              
+              The tangent vector of these two 1-parameter subgroups at the 
+              identity determines an element in the Lie algebra sl2+sl2 
+              of Aut(P^1xP^1):
+               
+                      [1, 0, 0, -1, 1, 0, 0, 1]
+                      [1, 0, 0, 1, 1, 0, 0, -1]
+              
+              It is possible to classify all Lie subalgebra's
+              of sl2+sl2 up to conjugacy.
+                
+              Each Lie subalgebra with n>0 generators determines a c_lst_lst of
+              length n. Now "c_lst_lst_dct[n]" is a list of "c_lst_lst"-lists
+              of lenght n.   
+        
+              Thus this methods returns a dictionary whose keys are positive 
+              integers (1,2,3...) and each value is a list of c_lst_lst lists 
+              of length equal to the corresponding key. Each c_lst_lst is a list 
+              of "c_lst"-list and c_lst is as described above.                         
         '''
+        # define c_list of all possible of 1-parameter
+        # subgroups of Aut(P^1xP^1) up to conjugacy.
+        #
+        k = ring( 'k' )
 
-        I = ring( 'I' )
-        x = x0, x1, x2, x3, x4, x5, x6, x7, x8 = MARing.x()
-        z = z0, z1, z2, z3, z4, z5, z6, z7, z8 = MARing.z()
+        a = k + 1
+        b = 1 / ( k + 1 )
 
-        dct1 = { x0:z0,
-                 x1:z1 + I * z2, x2:z1 - I * z2,
-                 x3:z3 + I * z4, x4:z3 - I * z4,
-                 x5:z5 + I * z6, x6:z5 - I * z6,
-                 x7:z7 + I * z8, x8:z7 - I * z8 }
-        dct2 = { z[i]:x[i] for i in range( 8 ) }
+        g1 = [1, k, 0, 1] + [1, 0, 0, 1]
+        g2 = [1, 0, k, 1] + [1, 0, 0, 1]
+        g3 = [a, 0, 0, b] + [1, 0, 0, 1]
 
-        new_lst = [ iqf.subs( dct1 ).subs( dct2 ) for iqf in iqf_lst ]
+        t1 = [1, 0, 0, 1] + [1, k, 0, 1]
+        t2 = [1, 0, 0, 1] + [1, 0, k, 1]
+        t3 = [1, 0, 0, 1] + [a, 0, 0, b]
 
-        return new_lst
+        g1xt1 = [1, k, 0, 1] + [1, k, 0, 1]
+        g2xt2 = [1, 0, k, 1] + [1, 0, k, 1]
+        g3xt3 = [a, 0, 0, b] + [a, 0, 0, b]
+        g1xt3 = [1, k, 0, 1] + [a, 0, 0, b]
+
+        # construct dictionary for string representation
+        #
+        DSegre.__str_dct[str( g1 )] = 'g1'
+        DSegre.__str_dct[str( g2 )] = 'g2'
+        DSegre.__str_dct[str( g3 )] = 'g3'
+
+        DSegre.__str_dct[str( t1 )] = 't1'
+        DSegre.__str_dct[str( t2 )] = 't2'
+        DSegre.__str_dct[str( t3 )] = 't3'
+
+        DSegre.__str_dct[str( g1xt1 )] = 'g1xt1'
+        DSegre.__str_dct[str( g2xt2 )] = 'g2xt2'
+        DSegre.__str_dct[str( g3xt3 )] = 'g3xt3'
+        DSegre.__str_dct[str( g1xt3 )] = 'g1xt3'
+
+
+        # construct dictionary for output
+        #
+        c_lst_lst_dct = {}
+
+        c_lst_lst_dct[1] = [ [g1], [g3], [g1xt1], [g3xt3], [g1xt3] ]
+
+        c_lst_lst_dct[2] = [ [g1, g3], [g1, t1],
+                             [g1, t3], [g3, t3],
+                             [g1xt3, t1], [g3xt3, t1],
+                             [g1xt1, g3xt3] ]
+
+        c_lst_lst_dct[3] = [ [g1, g2, g3],
+                             [g1, t1, t3],
+                             [g3, t1, t3],
+                             [g1xt1, g2xt2, g3xt3],
+                             [g1, t1, g3xt3] ]
+
+        c_lst_lst_dct[4] = [ [g1, g3, t1, t3],
+                             [g1, g2, g3, t1],
+                             [g1, g2, g3, t3] ]
+
+        c_lst_lst_dct[5] = [ [g1, g2, g3, t1, t3] ]
+
+        c_lst_lst_dct[6] = [ [g1, g2, g3, t1, t2, t3]]
+
+
+        return c_lst_lst_dct
+
+
+    @staticmethod
+    def to_str( c_lst_lst ):
+        '''
+        INPUT: 
+            - "c_lst_lst" -- See output "get_c_lst_lst_dct".
+        OUTPUT:
+            - A string representation for "c_lst_lst".
+        '''
+        if DSegre.__str_dct == {}:
+            DSegre.get_c_lst_lst_dct()
+
+        s = '< '
+        for c_lst in c_lst_lst:
+            s += DSegre.__str_dct[ str( c_lst ) ] + ', '
+        s = s[:-2]
+        s += ' >'
+
+        return s
+
+
+
+
+
+
+
+
+
+
 
