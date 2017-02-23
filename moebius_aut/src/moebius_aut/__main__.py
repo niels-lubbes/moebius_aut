@@ -34,18 +34,27 @@ def usecase__double_segre():
         mt.p( 10 * '=' )
 
         for c_lst_lst in c_lst_lst_dct[key]:
-             mt.p( '\t', 10 * '-' )
-             mt.p( '\t', 'group           =', DSegre.to_str( c_lst_lst ) )
-             mt.p( '\t', 'invariant ideal = <' )
-             J = DSegre.get_invariant_ideal( c_lst_lst, False )
-             for gen in J:
-                 sig = ''
-                 if 'I' not in str( gen ):
-                     sig = MARing.get_sig( gen )
-                 mt.p( '\t\t', gen, '\t\t', sig )
-             mt.p( '\t\t', '>' )
-             mt.p( '\t', 10 * '-' )
 
+            mt.p( '\t', 10 * '-' )
+            mt.p( '\t', 'group           =', DSegre.to_str( c_lst_lst ) )
+            mt.p( '\t', 10 * '-' )
+
+            for involution in ['identity', 'leftright', 'rotate']:
+
+                J = DSegre.get_invariant_ideal( c_lst_lst )
+                J = DSegre.change_basis( J )
+
+                mt.p( '\t', 'involution      =', involution )
+                mt.p( '\t', 'invariant ideal = <' )
+                for gen in J:
+                    sig = ''
+                    if 'I' not in str( gen ):
+                        sig = MARing.get_sig( gen )
+                    mt.p( '\t\t', gen, '\t\t', sig )
+                mt.p( '\t\t', '>' )
+                mt.p( '\t', 5 * '.-' )
+
+            mt.p( '\t', 10 * '-' )
 
 if __name__ == '__main__':
 

@@ -25,9 +25,48 @@ class TestClassDSegre:
         assert out == ring( chk_str )
 
 
-    def test__change_basis( self ):
+    def test__change_basis_identity( self ):
         qf_lst = DSegre.get_ideal_lst()
-        nqf_lst = DSegre.change_basis( qf_lst )
+        nqf_lst = DSegre.change_basis( qf_lst, 'identity' )
+
+        assert qf_lst == nqf_lst
+
+
+    def test__change_basis_leftright( self ):
+        qf_lst = DSegre.get_ideal_lst()
+        nqf_lst = DSegre.change_basis( qf_lst, 'leftright' )
+
+        chk_lst = '['
+        chk_lst += 'x0^2 - x1^2 - x2^2,'
+        chk_lst += 'x0^2 - x3*x4,'
+        chk_lst += 'x0^2 + I*x5*x6 - x5*x7 - x6*x8 - I*x7*x8,'
+        chk_lst += 'x0^2 - I*x5*x6 - x5*x7 - x6*x8 + I*x7*x8,'
+        chk_lst += 'x1^2 + 2*I*x1*x2 - x2^2 - I*x5*x6 - x5*x7 + x6*x8 - I*x7*x8,'
+        chk_lst += 'x1^2 - 2*I*x1*x2 - x2^2 + I*x5*x6 - x5*x7 + x6*x8 + I*x7*x8,'
+        chk_lst += 'x3^2 - x5^2 - x8^2,'
+        chk_lst += 'x4^2 - x6^2 - x7^2,'
+        chk_lst += 'x0*x1 + I*x0*x2 - x4*x5 - I*x4*x8,'
+        chk_lst += 'x0*x1 - I*x0*x2 + I*x3*x6 - x3*x7,'
+        chk_lst += 'x0*x3 - x1*x5 + I*x2*x5 - I*x1*x8 - x2*x8,'
+        chk_lst += 'x0*x4 + I*x1*x6 - x2*x6 - x1*x7 - I*x2*x7,'
+        chk_lst += 'x0*x1 + I*x0*x2 - I*x3*x6 - x3*x7,'
+        chk_lst += 'x0*x1 - I*x0*x2 - x4*x5 + I*x4*x8,'
+        chk_lst += 'x0*x3 - x1*x5 - I*x2*x5 + I*x1*x8 - x2*x8,'
+        chk_lst += 'x0*x4 - I*x1*x6 - x2*x6 - x1*x7 + I*x2*x7,'
+        chk_lst += '-x1*x3 - I*x2*x3 + x0*x5 + I*x0*x8,'
+        chk_lst += '-x1*x4 + I*x2*x4 - I*x0*x6 + x0*x7,'
+        chk_lst += '-x1*x4 - I*x2*x4 + I*x0*x6 + x0*x7,'
+        chk_lst += '-x1*x3 + I*x2*x3 + x0*x5 - I*x0*x8'
+        chk_lst += ']'
+
+        for nqf in nqf_lst:
+            print( nqf )
+        assert nqf_lst == ring( chk_lst )
+
+
+    def test__change_basis_rotate( self ):
+        qf_lst = DSegre.get_ideal_lst()
+        nqf_lst = DSegre.change_basis( qf_lst, 'rotate' )
 
         chk_lst = '['
         chk_lst += 'x0^2 - x1^2 - x2^2,'
@@ -159,26 +198,15 @@ class TestClassDSegre:
         assert ig_lst == ring( '[2*q8 + 2*q12, 2*q4, q1 + q2 + q3, (-1/2)*q11 + 1/2*q15, 1/2*q10 + (-1/2)*q14, 2*q4, 1/2*q8 + 1/2*q12, (-1/2)*q18, (-1/2)*q16, q1 + q2 + q3, 1/2*q8 + 1/2*q12, q9 + q13, (-1/2)*q10 + 1/2*q14, 1/2*q11 + (-1/2)*q15, 1/2*q16, 1/2*q18, (-1/2)*q10 + 1/2*q14, -q8 - q12, (-1/2)*q1 - q2, -q4, 1/2*q11 + (-1/2)*q15, -q8 - q12, -q4, (-1/2)*q1 - q3, 1/2*q16, -q4, (-1/2)*q8, (-1/2)*q11 + 1/2*q15, (-1/2)*q18, (-1/2)*q1 - q2, (-1/2)*q8, (-1/2)*q9 + (-1/2)*q13, 1/2*q18, -q4, (-1/2)*q12, 1/2*q10 + (-1/2)*q14, (-1/2)*q16, (-1/2)*q1 - q3, (-1/2)*q9 + (-1/2)*q13, (-1/2)*q12]' )
 
 
-    def test__get_invariant_ideal__SO2xSO2_False( self ):
+    def test__get_invariant_ideal__SO2xSO2( self ):
         k = ring( 'k' )
         c_lst_lst = []
         c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
         c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
 
-        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst, False )
+        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst )
         print( iqf_lst )
         assert iqf_lst == ring( '[x0^2 - x7*x8, x0^2 - x5*x6, x0^2 - x3*x4, x0^2 - x1*x2]' )
-
-
-    def test__get_invariant_ideal__SO2xSO2_True( self ):
-        k = ring( 'k' )
-        c_lst_lst = []
-        c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
-        c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
-
-        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst, True )
-        print( iqf_lst )
-        assert iqf_lst == ring( '[x0^2 - x7^2 - x8^2, x0^2 - x5^2 - x6^2, x0^2 - x3^2 - x4^2, x0^2 - x1^2 - x2^2]' )
 
 
     def test__get_c_lst_lst_dct( self ):

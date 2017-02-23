@@ -16,7 +16,7 @@ class MARing:
     
         FF[s,t,u,w,x#,y#,z#,q#,r%]
     
-    where # is in [0,19] and % is in [0,100]
+    where # is in [0,19] and % is in [0,1000]
     
         FF := NF(a,b,c,d,e,f,g,h,k) 
     and
@@ -24,6 +24,9 @@ class MARing:
         NF := QQ(I) 
     
     with I^2==-1
+    
+    The r% variables are in order to cast solution dictionaries as 
+    returned by the Sage "solve" method. 
     '''
 
     a = PolynomialRing( QQ, 'a' ).gens()[0]
@@ -38,7 +41,7 @@ class MARing:
     vz_lst = [ 'z' + str( i ) for i in range( 9 )]
     vs_lst = ['s', 't', 'u', 'w']
     vq_lst = [ 'q' + str( i ) for i in range( 20 ) ]
-    vr_lst = [ 'r' + str( i ) for i in range( 100 ) ]
+    vr_lst = [ 'r' + str( i ) for i in range( 1000 ) ]
 
     R = PolynomialRing( FF, vx_lst + vy_lst + vz_lst + vs_lst + vq_lst + vr_lst )
 
@@ -71,7 +74,7 @@ class MARing:
 
     @staticmethod
     def r():
-        return MARing.ring( [ring( 'r' + str( i ) ) for i in range( 100 )] )
+        return MARing.ring( [ring( 'r' + str( i ) ) for i in range( 1000 )] )
 
 
     @staticmethod

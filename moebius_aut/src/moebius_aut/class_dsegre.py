@@ -107,28 +107,114 @@ class DSegre( object ):
 
 
     @staticmethod
-    def change_basis( iqf_lst ):
+    def change_basis( iqf_lst, involution = 'identity' ):
         '''
         INPUT:
-            - A list of elements in "MARing.R".                          
+            - "iqf_lst"     -- A list of elements in the subring NF[x0,...,x8] 
+                               of "MARing.R" where NF denotes the Guassian 
+                               rationals QQ(I) with I^2=-1.
+                               
+            - "involution"  -- Either one of the following strings:
+                               'identity', 'leftright', 'rotate', 'diagonal'.
+                                
         OUTPUT:
-            - The elements of the input list wrt. a new basis. 
-              In this new basis an antiholomorphic involution
-              coincides with complex conjugation.                                           
+            - We consider a toric parametrization of double Segre surface
+              whose completion to P^1xP^1 is provided by "get_pmz_lst": 
+            
+                (s,u) |-->
+                (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
+                =
+                (x0:x1:x2:x3:x4:x5:x6:x7:x8)
+            
+              We can put the exponents of the monomials in a lattice
+              where x0 corresponds to coordinate (0,0), x6 to (-1,-1)
+              x5 to (1,1) and x8 to (-1,1): 
+                    
+                    x8 x3 x5
+                    x2 x0 x1
+                    x6 x4 x7
+                  
+              An antiholomorphic involution which preserves the toric structure
+              acts on the above lattice as a unimodular involution:
+                  
+                    identity_*:    ( a, b ) |--> ( a, b)
+                    leftright_*:   ( a, b ) |--> (-a, b)
+                    rotate_*:      ( a, b ) |--> (-a,-b)  
+                    diagonal_*:    ( a, b ) |--> ( b, a)
+        
+              These unimodular lattice involutions induce an involution on P^8: 
+
+                    identity: (x0:...:x8) |--> (x0:...:x8) 
+
+                    leftright:  x0 |--> x0,
+                                x1 |--> x1 + I*x2, 
+                                x2 |--> x1 - I*x2, 
+                                x3 |--> x3,  
+                                x4 |--> x4, 
+                                x5 |--> x5 + I*x8, 
+                                x6 |--> x7 - I*x6, 
+                                x7 |--> x7 + I*x6, 
+                                x8 |--> x5 - I*x8 
+
+                    rotate: x0 |--> x0,
+                            x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
+                            x3 |--> x3 + I*x4, x4 |--> x3 - I*x4, 
+                            x5 |--> x5 + I*x6, x6 |--> x5 - I*x6, 
+                            x7 |--> x7 + I*x8, x8 |--> x7 - I*x8      
+                            
+                            
+                    diagonal:   x5 |--> x5,
+                                x0 |--> x0, 
+                                x6 |--> x6, 
+                                x3 |--> x3 + I*x1,  
+                                x1 |--> x3 - I*x1,
+                                x8 |--> x8 + I*x7,  
+                                x7 |--> x8 - I*x7,
+                                x2 |--> x2 + I*x4,  
+                                x4 |--> x2 - I*x4
+                                
         '''
 
         I = ring( 'I' )
         x = x0, x1, x2, x3, x4, x5, x6, x7, x8 = MARing.x()
         z = z0, z1, z2, z3, z4, z5, z6, z7, z8 = MARing.z()
 
-        dct1 = { x0:z0,
-                 x1:z1 + I * z2, x2:z1 - I * z2,
-                 x3:z3 + I * z4, x4:z3 - I * z4,
-                 x5:z5 + I * z6, x6:z5 - I * z6,
-                 x7:z7 + I * z8, x8:z7 - I * z8 }
-        dct2 = { z[i]:x[i] for i in range( 9 ) }
+        dct = {}
 
-        new_lst = [ iqf.subs( dct1 ).subs( dct2 ) for iqf in iqf_lst ]
+        dct['identity'] = { x[i]:z[i] for i in range( 9 ) }
+
+        dct['rotate'] = {
+            x0:z0,
+            x1:z1 + I * z2, x2:z1 - I * z2,
+            x3:z3 + I * z4, x4:z3 - I * z4,
+            x5:z5 + I * z6, x6:z5 - I * z6,
+            x7:z7 + I * z8, x8:z7 - I * z8 }
+
+        dct['leftright'] = {
+            x0:z0,
+            x1:z1 + I * z2,
+            x2:z1 - I * z2,
+            x3:z3, x4:z4,
+            x5:z5 + I * z8,
+            x6:z7 - I * z6,
+            x7:z7 + I * z6,
+            x8:z5 - I * z8  }
+
+        dct['diagonal'] = {
+                 x0:z0,
+                 x6:z6,
+                 x5:z5,
+                 x3:z3 + I * z1,
+                 x1:z3 - I * z1,
+                 x8:z8 + I * z7,
+                 x7:z8 - I * z7,
+                 x2:z2 + I * z4,
+                 x4:z2 - I * z4
+                 }
+
+        zx_dct = { z[i]:x[i] for i in range( 9 ) }
+
+        new_lst = [ iqf.subs( dct[involution] ).subs( zx_dct ) for iqf in iqf_lst ]
 
         return new_lst
 
@@ -317,7 +403,7 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_invariant_ideal( c_lst_lst, basis_change = True ):
+    def get_invariant_ideal( c_lst_lst ):
         '''
         INPUT:
             -- "c_lst_lst"    - A list of "c_lst"-lists.
@@ -332,9 +418,7 @@ class DSegre( object ):
                                    ( [ c2 c3 ] , [ c6 c7 ] )                                   
                                 with the property that 
                                     c0*c3-c1*c2=c4*c7-c5*c6=1.            
-            
-            
-            -- "basis_change" - A boolean. 
+                                    
         OUTPUT:
             -- A list of quadratic forms in the ideal of the double Segre 
                surface S, such that the quadratic forms are invariant 
@@ -342,11 +426,7 @@ class DSegre( object ):
                and such that the quadratic forms generate the ideal of  
                all invariant quadratic forms.   
                            
-               For the ideal of all quadratic forms see ".get_ideal_lst()".
-               
-               If "basis_change==True" then the generators of the 
-               invariant ideal are returned wrt. new coordinates,
-               see ".change_basis()". 
+               For the ideal of all quadratic forms see ".get_ideal_lst()".              
         '''
 
         # for verbose output
@@ -390,13 +470,6 @@ class DSegre( object ):
             if coef != 0:
                 iqf_lst += [ coef ]
         mt.p( 'iqf_lst =', iqf_lst )
-
-        # change basis?
-        #
-        if basis_change:
-            iqf_lst = DSegre.change_basis( iqf_lst )
-
-
 
         return iqf_lst
 
