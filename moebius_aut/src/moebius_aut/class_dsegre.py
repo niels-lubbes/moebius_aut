@@ -449,11 +449,8 @@ class DSegre( object ):
         iq_lst = list( MARing.R.ideal( iq_lst ).groebner_basis() )
 
         # solve the ideal defined by "iq_lst"
-        # In order to use solve of Sage we cast to the symbolic ring "SR".
         #
-        sol_dct = solve( [SR( str( iq ) ) for iq in iq_lst], [var( str( qi ) ) for qi in q], solution_dict = True )
-        mt.p( 'sol_dct =', sol_dct )
-        sol_dct = ring( sol_dct )[0]
+        sol_dct = MARing.solve( iq_lst, q )
 
         # substitute the solution in the quadratic form
         # associated to "get_q_mat()".

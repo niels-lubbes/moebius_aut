@@ -25,6 +25,14 @@ class TestMARing:
         assert sig == [1, 4]
 
 
+    def test__get_sig__13( self ):
+        pol = MARing.ring( 'x4^2-x6*x7 + x2^2-x6*x8 - x2*x4+x0*x6' )
+        sig = MARing.get_sig( pol )
+        print( pol )
+        print( sig )
+        assert sig == [1, 3]
+
+
     def test__diff_mat__a00b( self ):
         mat = ring( 'matrix([(a,0),(0,1/a)])' )
         a = ring( 'a' )
@@ -32,5 +40,27 @@ class TestMARing:
         print( mat )
         print( dmat )
         assert dmat == matrix( MARing.FF, [( 1, 0 ), ( 0, -1 / a ** 2 )] )
+
+
+    def test__solve( self ):
+
+        q = MARing.q()
+        pol_lst = [ q[0] + 2 * q[1] + 3 * q[2] - 4 ]
+        var_lst = [ q[i] for i in [0, 1, 2]]
+
+        sol_dct = MARing.solve( pol_lst, var_lst )
+        print( sol_dct )
+        assert 'r0' in str( sol_dct )
+
+        sol_dct = MARing.solve( pol_lst, var_lst )
+        print( sol_dct )
+        assert 'r0' in str( sol_dct )
+
+
+
+
+
+
+
 
 

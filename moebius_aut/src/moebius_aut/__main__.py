@@ -42,7 +42,7 @@ def usecase__double_segre():
             for involution in ['identity', 'leftright', 'rotate']:
 
                 J = DSegre.get_invariant_ideal( c_lst_lst )
-                J = DSegre.change_basis( J )
+                J = DSegre.change_basis( J, involution )
 
                 mt.p( '\t', 'involution      =', involution )
                 mt.p( '\t', 'invariant ideal = <' )
@@ -60,7 +60,13 @@ if __name__ == '__main__':
 
     mt.start_timer()
     mt.filter( '__main__.py' )
-    usecase__double_segre()
+    # usecase__double_segre()
+
+    s = 'x0*x1 + x1*x2-x3^2'
+    pol = MARing.ring( s )
+    sig = MARing.get_sig( pol )
+    print( pol )
+    print( sig )
 
     mt.stop_timer()
     print
