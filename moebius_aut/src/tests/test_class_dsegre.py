@@ -100,7 +100,7 @@ class TestClassDSegre:
         assert len( out ) == 9
 
 
-    def test__get_aut_P8__None( self ):
+    def test__get_aut_P8__abcdefgh( self ):
         chk_mat = ''
         chk_mat += '['
         chk_mat += '(b*c*f*g + a*d*f*g + b*c*e*h + a*d*e*h, a*c*f*g + a*c*e*h, b*d*f*g + b*d*e*h, b*c*e*g + a*d*e*g, b*c*f*h + a*d*f*h, a*c*e*g, b*d*f*h, a*c*f*h, b*d*e*g),'

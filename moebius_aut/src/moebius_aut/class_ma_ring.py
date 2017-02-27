@@ -219,6 +219,37 @@ class MARing:
 
 
     @staticmethod
+    def get_rand_sigs( pol_lst, num_tries = 10 ):
+        '''
+        INPUT:
+            - "pol_lst"   -- A list of polynomials in the ring "MARing.R".
+            - "num_tries" -- A positive integer. 
+        OUTPUT:
+            - Returns a sorted list of pairs of integers that represent 
+              signatures of random quadratic forms in the ideal generated 
+              by "pol_lst". For each subset of the list of quadrics, this 
+              method computes "num_tries" of random linear combination of 
+              this subset of quadratic forms. 
+        '''
+        q_lst = [ pol for pol in pol_lst if pol.total_degree() == 2 ]
+
+        sig_lst = []
+        for s_lst in Subsets( len( q_lst ) ):
+            for i in range( num_tries ):
+                quad = sum( [  QQ.random_element() * q_lst[s - 1] for s in s_lst ] )
+                if quad in QQ:
+                    continue
+                sig = MARing.get_sig( quad )
+                if sig not in sig_lst:
+                    sig_lst += [sig ]
+                    MATools.p( 'sig =', sig, '\t\t quad =', quad )
+                    MATools.p( '\t\t sub_lst', [q_lst[s - 1] for s in s_lst ] )
+
+        return sorted( sig_lst )
+
+
+
+    @staticmethod
     def random_int( val ):
         '''
         INPUT:

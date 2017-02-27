@@ -34,10 +34,13 @@ def usecase__represent():
         w8 = ring( 'x0^2 - x3^2 - x4^2 ' )
         w9 = ring( 'x0^2 - x1^2 - x2^2' )
 
+        sig_lst = MARing.get_rand_sigs( [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9], 1 )
+        mt.p( sig_lst )
+
         mt.p( MARing.get_sig( w9 + w8 + w6 + w0 ) )
         sys.exit()
 
-    if True:
+    if False:
         w0 = ring( 'x5*x6 - x7*x8' )
         w1 = ring( 'x1*x6 - x2*x7 ' )
         w2 = ring( 'x2*x5 - x1*x8 ' )
@@ -49,6 +52,9 @@ def usecase__represent():
         w8 = ring( 'x0^2 - x3*x4 ' )
         w9 = ring( 'x0^2 - x1^2 - x2^2' )
 
+        sig_lst = MARing.get_rand_sigs( [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9], 1 )
+        mt.p( sig_lst )
+
         # for w in [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9]:
         #    mt.p( MARing.get_sig( w9 + w3 - w8 - w ) )
 
@@ -58,55 +64,85 @@ def usecase__represent():
         sys.exit()
 
 
+    # init ring variables.
     k = ring( 'k' )
     I = ring( 'I' )
     a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+    x = MARing.x()
+    q = MARing.q()
+    r = MARing.r()
+
+
     U, V = k + 1, 1 / ( k + 1 )
+    aa, bb, cc, dd = 1, 0, 0, 1
+    ee, ff, gg, hh = 1, 0, 0, 1
+    involution = 'identity'
+    g3 = [I * U, 0, 0, -I * V]
+    t1 = [1, k, 0, 1]
+    c_lst = g3 + t1
 
-    a, b, c, d = 1, 0, 0, 1
-    A = matrix( MARing.R, [( a, b ), ( c, d )] )
-    B = matrix( MARing.R, [( d, -b ), ( -c, a )] )
-    M = matrix( MARing.R, [( U * I, 0 ), ( 0, -I * V )] )
-    N = B * M * A
-    c_lst = N.list() + [1, 0, 0, 1]
+    A = DSegre.get_aut_P8( [aa, bb, cc, dd] + [ee, ff, gg, hh] )
+    M = DSegre.get_aut_P8( c_lst )
+    B = DSegre.get_aut_P8( [dd, -bb, -cc, aa] + [hh, -ff, -gg, ee] )
 
-    # c_lst = [I * U, 0, 0, -I * V] + [1, 0, 0, 1]
-
-    H = DSegre.get_aut_P8( c_lst )
+    H = B * M * A
     D = MARing.diff_mat( H, k ).subs( {k:0} )
     Q = DSegre.get_qmat()
-
-    mt.p( 'M =\n' + str( M ) )
-    mt.p( 'N = B*M*A =\n' + str( N ) )
-    mt.p( 'H =\n' + str( H ) )
-    mt.p( 'D =\n' + str( D ) )
-
     Z = D.T * Q + Q * D
-    J = MARing.R.ideal( ring( Z.list() ) )
-    gb_lst = list( J.groebner_basis() )
-    mt.p( 'gb =' )
-    for gb in gb_lst:
-        mt.p( '\t', gb )
 
 
-    iq_lst = DSegre.get_invariant_ideal( [c_lst] )
-    iq_lst = DSegre.change_basis( iq_lst, 'leftright' )
+    mt.p( 'A =\n' + str( A ) )
+    mt.p( 'B =\n' + str( B ) )
+    mt.p( 'M =\n' + str( M ) )
+    mt.p( 'H = B*M*A =\n' + str( H ) )
+    mt.p( 'D =\n' + str( D ) )
+    mt.p( 'Q =\n' + str( Q ) )
+    mt.p( 'Z =\n' + str( Z ) )
+
+
+    # solve the entries of Z in q
+    #
+    sol_dct = MARing.solve( [iq for iq in Z.list() if iq != 0 ], q )
+
+    # substitute the solution in the quadratic form
+    # associated to "Q"
+    #
+    qpol = list( vector( x ).row() * Q * vector( x ).column() )[0][0]
+    sqpol = qpol.subs( sol_dct )
+    mt.p( 'sqpol   =', sqpol )
+    assert sqpol.subs( {ri:0 for ri in r} ) == 0
+    iq_lst = []
+    for i in range( len( r ) ):
+        coef = sqpol.coefficient( r[i] )
+        if coef != 0:
+            iq_lst += [ coef ]
+    mt.p( 'iq_lst =', iq_lst )
+
+    iq_lst = DSegre.change_basis( iq_lst, involution )
     iq_lst = MARing.replace_conj_pairs( iq_lst )
 
+    # determine polynomials without variables
+    pol_lst = []
+    for iq in iq_lst:
+        abcdI = False
+        for char in ring( '[a, b, c, d, I]' ):
+            if str( char ) in str( iq ):
+                abcdI = True
+        if not abcdI:
+            pol_lst += [iq]
+
+    # print invariant quadratic forms
     mt.p( 'iq_lst =' )
     for iq in iq_lst:
         mt.p( '\t', iq )
-        abcd = False
-        for char in ring( '[a, b, c, d]' ):
-            if str( char ) in str( iq ):
-                abcd = True
-        if not abcd:
-            mt.p( '\t\t', MARing.get_sig( iq ) )
 
+    # print invariant quadratic forms
+    mt.p( 'pol_lst =' )
+    for pol in pol_lst:
+        mt.p( '\t', pol )
 
-    w0, w1, w2, w3, w4, w5, w6, w7, w8, w9 = iq_lst
-    mt.p( MARing.get_sig( w9 ) )
-
+    sig_lst = MARing.get_rand_sigs( pol_lst, 20 )
+    mt.p( sig_lst )
 
 
 def usecase__double_segre():
@@ -156,7 +192,7 @@ def usecase__double_segre():
 if __name__ == '__main__':
 
     mt.start_timer()
-    mt.filter( '__main__.py' )
+    # mt.filter( '__main__.py' )
 
     usecase__represent()
     # usecase__double_segre()

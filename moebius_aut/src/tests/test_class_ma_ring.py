@@ -32,6 +32,16 @@ class TestMARing:
         print( sig )
         assert sig == [1, 3]
 
+    def test__get_rand_sigs__( self ):
+
+        pol_lst = []
+        pol_lst += [ring( 'x4^2 - x6^2 - x7^2 ' )]
+        pol_lst += [ring( 'x0^2 - x3*x4 ' )]
+
+        sig_lst = MARing.get_rand_sigs( pol_lst, 1 )
+        print( sig_lst )
+        assert [ 1, 2 ] in sig_lst
+
 
     def test__diff_mat__a00b( self ):
         mat = ring( 'matrix([(a,0),(0,1/a)])' )
