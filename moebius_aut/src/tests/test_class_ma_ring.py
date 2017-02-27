@@ -57,10 +57,15 @@ class TestMARing:
         assert 'r0' in str( sol_dct )
 
 
+    def test__replace_conj_pairs( self ):
 
+        q_lst = ring( '[ x0-I*x1, x0+I*x1, x0+x2, x3*I]' )
+        new_lst = MARing.replace_conj_pairs( q_lst )
+        chk_lst = sorted( ring( '[ x0, x1, x0+x2, x3*I]' ) )
 
-
-
-
+        print( q_lst )
+        print( new_lst )
+        print( chk_lst )
+        assert chk_lst == new_lst
 
 

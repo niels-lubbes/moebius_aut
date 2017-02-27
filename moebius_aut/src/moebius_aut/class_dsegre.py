@@ -146,15 +146,16 @@ class DSegre( object ):
 
                     identity: (x0:...:x8) |--> (x0:...:x8) 
 
-                    leftright:  x0 |--> x0,
+                    leftright:  x3 |--> x3,
+                                x0 |--> x0,  
+                                x4 |--> x4,                     
                                 x1 |--> x1 + I*x2, 
                                 x2 |--> x1 - I*x2, 
-                                x3 |--> x3,  
-                                x4 |--> x4, 
                                 x5 |--> x5 + I*x8, 
-                                x6 |--> x7 - I*x6, 
-                                x7 |--> x7 + I*x6, 
-                                x8 |--> x5 - I*x8 
+                                x8 |--> x5 - I*x8,                                
+                                x7 |--> x7 + I*x6,
+                                x6 |--> x7 - I*x6 
+                                 
 
                     rotate: x0 |--> x0,
                             x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
@@ -192,13 +193,14 @@ class DSegre( object ):
 
         dct['leftright'] = {
             x0:z0,
+            x3:z3,
+            x4:z4,
+            x5:z5 + I * z8,
+            x8:z5 - I * z8,
             x1:z1 + I * z2,
             x2:z1 - I * z2,
-            x3:z3, x4:z4,
-            x5:z5 + I * z8,
-            x6:z7 - I * z6,
             x7:z7 + I * z6,
-            x8:z5 - I * z8  }
+            x6:z7 - I * z6 }
 
         dct['diagonal'] = {
                  x0:z0,
@@ -244,37 +246,34 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_aut_P8( c_lst = None ):
+    def get_aut_P8( c_lst ):
         '''
-        The double Segre surface S is isomorphic to P^1xP^1.
-        The following pair of 2x2 matrices denotes an automorphism 
-        of P^1xP^1:
-              ( [ a b ]   [ e f ] ) = (A,B)
-              ( [ c d ] , [ g h ] )
-        We compute the representation of this automorphism in P^8
-        by using the parametrization as provided by ".get_pmz_lst".
-        Since we consider the 2x2 matrix up to multiplication
-        by a constant, the automorphism group is 6-dimensional.        
-        Formally, this method computes Sym^2(A)@Sym^2(B) 
-        where @ denotes the tensor product (otimes in tex).
-
         INPUT: 
-            -- "c_lst" - Either None, or a list of length 8 with 
+            -- "c_lst" - A list of length 8 with 
                          elements c0,...,c7 in "MARing.FF". We 
-                         assume that the pair of matrices                                                                                 
-                            ( [ c0 c1 ]   [ c4 c5 ] ) = (C,D) 
-                            ( [ c2 c3 ] , [ c6 c7 ] )
+                         assume that the pair of matrices 
+                            ( [ c0 c1 ]   [ c4 c5 ] ) = (A,B) 
+                            ( [ c2 c3 ] , [ c6 c7 ] )                                                                                                                                                         
                          represent an automorphism of P^1xP^1
-                         such that both matrices are normalized 
-                         to have determinant 1. 
+                         where both matrices are assumed to be
+                         normalized to have determinant 1. 
                                                              
         OUTPUT:
             - This method returns a 9x9 matrix defined over "MARing.FF",
               which represents a (parametrized) automorphism of P^8
               that preserves the double Segre surface S. 
+                                                  
+        METHOD:
+            - The double Segre surface S is isomorphic to P^1xP^1.
+              The pair (A,B) of 2x2 matrices denotes an automorphism 
+              of P^1xP^1. We compute the representation of this 
+              automorphism in P^8 by using the parametrization as 
+              provided by ".get_pmz_lst". Since we consider the 
+              2x2 matrices up to multiplication by a constant, 
+              it follows that the automorphism group is 6-dimensional.        
+              Formally, this method computes Sym^2(A)@Sym^2(B) 
+              where @ denotes the tensor product (otimes in tex).
             
-              Returns Sym^2(A)@Sym^2(B) if "c_lst==None".
-              Returns Sym^2(C)@Sym^2(D) if "c_lst!=None".                                
         '''
         # obtain parametrization in order to compute Sym^2(?)@Sym^2(?)
         #
@@ -282,17 +281,16 @@ class DSegre( object ):
 
         # compute automorphisms double Segre surface
         #
-        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        c0, c1, c2, c3, c4, c5, c6, c7 = c_lst
         x0, x1, y0, y1 = ring( 'x0,x1,y0,y1' )
         s, t, u, w = ring( 's,t,u,w' )  # coordinates of P^1xP^1
-        dct1a = {}
-        dct1a.update( {s:a * x0 + b * x1} )
-        dct1a.update( {t:c * x0 + d * x1} )
-        dct1a.update( {u:e * y0 + f * y1} )
-        dct1a.update( {w:g * y0 + h * y1} )
-        spmz_lst = [ pmz.subs( dct1a ) for pmz in pmz_lst]
-        dct1b = {x0:s, x1:t, y0:u, y1:w}
-        spmz_lst = [ spmz.subs( dct1b ) for spmz in spmz_lst]
+        dct1 = {}
+        dct1.update( {s:c0 * x0 + c1 * x1} )
+        dct1.update( {t:c2 * x0 + c3 * x1} )
+        dct1.update( {u:c4 * y0 + c5 * y1} )
+        dct1.update( {w:c6 * y0 + c7 * y1} )
+        dct2 = {x0:s, x1:t, y0:u, y1:w}
+        spmz_lst = [ pmz.subs( dct1 ).subs( dct2 ) for pmz in pmz_lst]
 
         # compute matrix from reparametrization "spmz_lst"
         # this is a representation of element in Aut(P^1xP^1)
@@ -305,12 +303,8 @@ class DSegre( object ):
             mat += [row]
         mat = matrix( MARing.FF, mat )
 
-        # substitute
-        #
-        if c_lst != None:
-            c0, c1, c2, c3, c4, c5, c6, c7 = c_lst
-            subs_dct = {a:c0, b:c1, c:c2, d:c3, e:c4, f:c5, g:c6, h:c7}
-            mat = mat.subs( subs_dct )
+        MATools.p( 'c_lst =', c_lst )
+        MATools.p( 'mat =\n' + str( mat ) )
 
         return mat
 

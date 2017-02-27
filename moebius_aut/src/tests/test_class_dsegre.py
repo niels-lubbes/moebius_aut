@@ -116,7 +116,8 @@ class TestClassDSegre:
 
         chk_mat = 'matrix(' + chk_mat + ')'
 
-        out = DSegre.get_aut_P8()
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        out = DSegre.get_aut_P8( [a, b, c, d, e, f, g, h] )
         print( list( out ) )
         print( out )
         assert out == ring( chk_mat )
@@ -239,5 +240,50 @@ class TestClassDSegre:
         s = s[:-2] + ' ]'
         print( s )
         assert s == '[ < g1, g3 >, < g1, t1 >, < g1, t3 >, < g3, t3 >, < g1xt3, t1 >, < g3xt3, t1 >, < g1xt1, g3xt3 > ]'
+
+
+    def test__get_aut_P8__action_of_involution( self ):
+
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+
+        # left-right involution
+        #
+        M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
+        L = matrix( [
+            ( 1, 0, 0, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 1, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 1, 0, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 1, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 0, 1, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 0, 0, 0, 0, 0, 1 ),
+            ( 0, 0, 0, 0, 0, 0, 0, 1, 0 ),
+            ( 0, 0, 0, 0, 0, 0, 1, 0, 0 ),
+            ( 0, 0, 0, 0, 0, 1, 0, 0, 0 )
+            ] )
+        assert L == ~L
+        LML = ~L * M * L
+        LML_chk = DSegre.get_aut_P8( [d, c, b, a] + [e, f, g, h] )
+        assert LML_chk == LML
+
+
+        # rotate
+        #
+        M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
+        R = matrix( [
+            ( 1, 0, 0, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 1, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 1, 0, 0, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 0, 1, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 1, 0, 0, 0, 0, 0 ),
+            ( 0, 0, 0, 0, 0, 0, 1, 0, 0 ),
+            ( 0, 0, 0, 0, 0, 1, 0, 0, 0 ),
+            ( 0, 0, 0, 0, 0, 0, 0, 0, 1 ),
+            ( 0, 0, 0, 0, 0, 0, 0, 1, 0 )
+            ] )
+        assert R == ~R
+        RMR = ~R * M * R
+        RMR_chk = DSegre.get_aut_P8( [d, c, b, a] + [h, g, f, e] )
+        assert RMR_chk == RMR
+
 
 
