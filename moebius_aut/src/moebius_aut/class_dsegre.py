@@ -397,7 +397,7 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_invariant_ideal( c_lst_lst ):
+    def get_invariant_qf( c_lst_lst ):
         '''
         INPUT:
             -- "c_lst_lst"    - A list of "c_lst"-lists.
@@ -417,7 +417,7 @@ class DSegre( object ):
             -- A list of quadratic forms in the ideal of the double Segre 
                surface S, such that the quadratic forms are invariant 
                under the automorphisms of S as defined by "c_lst_lst"
-               and such that the quadratic forms generate the ideal of  
+               and such that the quadratic forms generate the module of  
                all invariant quadratic forms.   
                            
                For the ideal of all quadratic forms see ".get_ideal_lst()".              
@@ -523,59 +523,59 @@ class DSegre( object ):
         a = k + 1
         b = 1 / ( k + 1 )
 
-        g1 = [1, k, 0, 1] + [1, 0, 0, 1]
-        g2 = [1, 0, k, 1] + [1, 0, 0, 1]
-        g3 = [a, 0, 0, b] + [1, 0, 0, 1]
+        t1 = [1, k, 0, 1] + [1, 0, 0, 1]
+        q1 = [1, 0, k, 1] + [1, 0, 0, 1]
+        s1 = [a, 0, 0, b] + [1, 0, 0, 1]
 
-        t1 = [1, 0, 0, 1] + [1, k, 0, 1]
-        t2 = [1, 0, 0, 1] + [1, 0, k, 1]
-        t3 = [1, 0, 0, 1] + [a, 0, 0, b]
+        t2 = [1, 0, 0, 1] + [1, k, 0, 1]
+        q2 = [1, 0, 0, 1] + [1, 0, k, 1]
+        s2 = [1, 0, 0, 1] + [a, 0, 0, b]
 
-        g1xt1 = [1, k, 0, 1] + [1, k, 0, 1]
-        g2xt2 = [1, 0, k, 1] + [1, 0, k, 1]
-        g3xt3 = [a, 0, 0, b] + [a, 0, 0, b]
-        g1xt3 = [1, k, 0, 1] + [a, 0, 0, b]
+        t1xt2 = [1, k, 0, 1] + [1, k, 0, 1]
+        q1xq2 = [1, 0, k, 1] + [1, 0, k, 1]
+        s1xs2 = [a, 0, 0, b] + [a, 0, 0, b]
+        t1xs2 = [1, k, 0, 1] + [a, 0, 0, b]
 
         # construct dictionary for string representation
         #
-        DSegre.__str_dct[str( g1 )] = 'g1'
-        DSegre.__str_dct[str( g2 )] = 'g2'
-        DSegre.__str_dct[str( g3 )] = 'g3'
-
         DSegre.__str_dct[str( t1 )] = 't1'
-        DSegre.__str_dct[str( t2 )] = 't2'
-        DSegre.__str_dct[str( t3 )] = 't3'
+        DSegre.__str_dct[str( q1 )] = 'q1'
+        DSegre.__str_dct[str( s1 )] = 's1'
 
-        DSegre.__str_dct[str( g1xt1 )] = 'g1xt1'
-        DSegre.__str_dct[str( g2xt2 )] = 'g2xt2'
-        DSegre.__str_dct[str( g3xt3 )] = 'g3xt3'
-        DSegre.__str_dct[str( g1xt3 )] = 'g1xt3'
+        DSegre.__str_dct[str( t2 )] = 't2'
+        DSegre.__str_dct[str( q2 )] = 'q2'
+        DSegre.__str_dct[str( s2 )] = 's2'
+
+        DSegre.__str_dct[str( t1xt2 )] = 't1xt2'
+        DSegre.__str_dct[str( q1xq2 )] = 'q1xq2'
+        DSegre.__str_dct[str( s1xs2 )] = 's1xs2'
+        DSegre.__str_dct[str( t1xs2 )] = 't1xs2'
 
 
         # construct dictionary for output
         #
         c_lst_lst_dct = {}
 
-        c_lst_lst_dct[1] = [ [g1], [g3], [g1xt1], [g3xt3], [g1xt3] ]
+        c_lst_lst_dct[1] = [ [t1], [s1], [t1xt2], [s1xs2], [t1xs2] ]
 
-        c_lst_lst_dct[2] = [ [g1, g3], [g1, t1],
-                             [g1, t3], [g3, t3],
-                             [g1xt3, t1], [g3xt3, t1],
-                             [g1xt1, g3xt3] ]
+        c_lst_lst_dct[2] = [ [t1, s1], [t1, t2],
+                             [t1, s2], [s1, s2],
+                             [t1xs2, t2], [s1xs2, t2],
+                             [t1xt2, s1xs2] ]
 
-        c_lst_lst_dct[3] = [ [g1, g2, g3],
-                             [g1, t1, t3],
-                             [g3, t1, t3],
-                             [g1xt1, g2xt2, g3xt3],
-                             [g1, t1, g3xt3] ]
+        c_lst_lst_dct[3] = [ [t1, q1, s1],
+                             [t1, t2, s2],
+                             [s1, t2, s2],
+                             [t1xt2, q1xq2, s1xs2],
+                             [t1, t2, s1xs2] ]
 
-        c_lst_lst_dct[4] = [ [g1, g3, t1, t3],
-                             [g1, g2, g3, t1],
-                             [g1, g2, g3, t3] ]
+        c_lst_lst_dct[4] = [ [t1, s1, t2, s2],
+                             [t1, q1, s1, t2],
+                             [t1, q1, s1, s2] ]
 
-        c_lst_lst_dct[5] = [ [g1, g2, g3, t1, t3] ]
+        c_lst_lst_dct[5] = [ [t1, q1, s1, t2, s2] ]
 
-        c_lst_lst_dct[6] = [ [g1, g2, g3, t1, t2, t3]]
+        c_lst_lst_dct[6] = [ [t1, q1, s1, t2, q2, s2]]
 
 
         return c_lst_lst_dct

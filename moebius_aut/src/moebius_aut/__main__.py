@@ -13,150 +13,144 @@ from class_dsegre import DSegre
 mt = MATools()
 
 
-def usecase__represent():
+def usecase__invariant_quadratic_forms( case = 2 ):
     '''
     OUTPUT:
-        - Compute representations of 1-parameter subgroups of
-          Aut(P^1xP^1) into End(P^8). 
+        - Let G be a subgroup of Aut(P^1xP^1)
+          Compute the vectors space of G-invariant quadratic forms in
+          the ideal of the double Segre surface.
+          For "DSegre.change_basis()" for the specification
+          of involutions.
+          
+            case==1: 
+                G = Aut(P^1xP^1)
+                involution = 'identity' 
+        
+            case==2:
+                G = toric automorphisms of P^1xP^1
+                involution = 'rotate'
+                  
     '''
 
-
-
-    if False:
-        w0 = ring( '2*x3*x4 - x6*x7 + x5*x8' )
-        w1 = ring( 'x0*x4 - x2*x7 + x1*x8 ' )
-        w2 = ring( 'x0*x4 + x2*x5 - x1*x6' )
-        w3 = ring( 'x3^2 - x4^2 - x5*x7 - x6*x8' )
-        w4 = ring( 'x0*x3 - x1*x7 - x2*x8' )
-        w5 = ring( 'x0*x3 - x1*x5 - x2*x6' )
-        w6 = ring( 'x0^2 - x7^2 - x8^2' )
-        w7 = ring( 'x0^2 - x5^2 - x6^2 ' )
-        w8 = ring( 'x0^2 - x3^2 - x4^2 ' )
-        w9 = ring( 'x0^2 - x1^2 - x2^2' )
-
-        sig_lst = MARing.get_rand_sigs( [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9], 1 )
-        mt.p( sig_lst )
-
-        mt.p( MARing.get_sig( w9 + w8 + w6 + w0 ) )
-        sys.exit()
-
-    if False:
-        w0 = ring( 'x5*x6 - x7*x8' )
-        w1 = ring( 'x1*x6 - x2*x7 ' )
-        w2 = ring( 'x2*x5 - x1*x8 ' )
-        w3 = ring( 'x4^2 - x6^2 - x7^2 ' )
-        w4 = ring( 'x0*x4 - x2*x6 - x1*x7' )
-        w5 = ring( 'x3^2 - x5^2 - x8^2 ' )
-        w6 = ring( 'x0*x3 - x1*x5 - x2*x8' )
-        w7 = ring( 'x0^2 - x5*x7 - x6*x8' )
-        w8 = ring( 'x0^2 - x3*x4 ' )
-        w9 = ring( 'x0^2 - x1^2 - x2^2' )
-
-        sig_lst = MARing.get_rand_sigs( [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9], 1 )
-        mt.p( sig_lst )
-
-        # for w in [w0, w1, w2, w3, w4, w5, w6, w7, w8, w9]:
-        #    mt.p( MARing.get_sig( w9 + w3 - w8 - w ) )
-
-        # pol = w9 + w3 - w8
-        pol = w3 + w5
-        mt.p( pol, MARing.get_sig( pol ) )
-        sys.exit()
-
-
-    # init ring variables.
+    #
+    # declare generators of 1-parameter subgroups in k
+    # such that k=0 is the identity.
+    #
     k = ring( 'k' )
     I = ring( 'I' )
-    a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
-    x = MARing.x()
-    q = MARing.q()
-    r = MARing.r()
-
-
     U, V = k + 1, 1 / ( k + 1 )
-    aa, bb, cc, dd = 1, 0, 0, 1
-    ee, ff, gg, hh = 1, 0, 0, 1
-    involution = 'identity'
-    g3 = [I * U, 0, 0, -I * V]
-    t1 = [1, k, 0, 1]
-    c_lst = g3 + t1
 
-    A = DSegre.get_aut_P8( [aa, bb, cc, dd] + [ee, ff, gg, hh] )
-    M = DSegre.get_aut_P8( c_lst )
-    B = DSegre.get_aut_P8( [dd, -bb, -cc, aa] + [hh, -ff, -gg, ee] )
-
-    H = B * M * A
-    D = MARing.diff_mat( H, k ).subs( {k:0} )
-    Q = DSegre.get_qmat()
-    Z = D.T * Q + Q * D
-
-
-    mt.p( 'A =\n' + str( A ) )
-    mt.p( 'B =\n' + str( B ) )
-    mt.p( 'M =\n' + str( M ) )
-    mt.p( 'H = B*M*A =\n' + str( H ) )
-    mt.p( 'D =\n' + str( D ) )
-    mt.p( 'Q =\n' + str( Q ) )
-    mt.p( 'Z =\n' + str( Z ) )
-
-
-    # solve the entries of Z in q
     #
-    sol_dct = MARing.solve( [iq for iq in Z.list() if iq != 0 ], q )
-
-    # substitute the solution in the quadratic form
-    # associated to "Q"
+    # generators for real 1-parameter subgroups of Aut(P^1).
     #
-    qpol = list( vector( x ).row() * Q * vector( x ).column() )[0][0]
-    sqpol = qpol.subs( sol_dct )
-    mt.p( 'sqpol   =', sqpol )
-    assert sqpol.subs( {ri:0 for ri in r} ) == 0
-    iq_lst = []
-    for i in range( len( r ) ):
-        coef = sqpol.coefficient( r[i] )
-        if coef != 0:
-            iq_lst += [ coef ]
-    mt.p( 'iq_lst =', iq_lst )
+    # For our algorithms only the tangent vectors of these
+    # 1-parameter subgroups at the identity are relevant.
+    #
+    # For example if the involution is the identity then
+    # the 1-parameter subgroup r has the same tangent vector
+    # as the rotations [cos(k),-sin(k), sin(k), cos(k)].
+    #
+    # The antiholomorphic involution coming from the real
+    # structure induces---up to conjugacy---two possible involutions
+    # acting on the 2x2matrices:
+    #     R1: complex conjugation
+    #     R2: [a,b,c,d] --> [d,c,b,a] followed by complex conjugation.
+    #
+    # The 1-parameter subgroup i*T is conjugate to t and invariant
+    # under involution R2.
+    #
+    # Note that t are scaling wrt. R1 but rotations wrt. R2.
+    #
+    t = [1, k, 0, 1]  # translation wrt. R1
+    q = [1, 0, k, 1]  #
+    s = [U, 0, 0, V]  # scalings (or rotations wrt. R2)
+    r = [1, -k, k, 1]  # rotations (or scalings wrt. R2)
+    e = [1, 0, 0, 1]  # identity
+    T = [U, k, -k, V]  # translations wrt. R2
 
+    #
+    # "involution" is in { 'identity', 'leftright', 'rotate', 'diagonal' }
+    #
+    # "c_lst_lst" represents a subgroup G of Aut(P^1xP^1) as a list of
+    # 1-parameter subgroups that generate G.
+    #
+    if case == 1:
+        c_lst_lst = [t + e, q + e, s + e, e + t, e + q, e + s ]
+        involution = 'identity'
+        info = 'SL2+SL2'
+
+    elif case == 2:
+        c_lst_lst = [ s + e, e + s ]
+        involution = 'rotate'
+        info = 'toric'
+
+    else:
+        raise ValueError( 'Unknown case: ', case )
+
+    #
+    # compute vector space of invariant quadratic forms
+    #
+    iq_lst = DSegre.get_invariant_qf( c_lst_lst )
     iq_lst = DSegre.change_basis( iq_lst, involution )
     iq_lst = MARing.replace_conj_pairs( iq_lst )
 
-    # determine polynomials without variables
-    pol_lst = []
-    for iq in iq_lst:
-        abcdI = False
-        for char in ring( '[a, b, c, d, I]' ):
-            if str( char ) in str( iq ):
-                abcdI = True
-        if not abcdI:
-            pol_lst += [iq]
+    #
+    # computes signatures of random quadrics in
+    # the vector space of invariant quadratic forms.
+    #
+    sig_lst = MARing.get_rand_sigs( iq_lst, 10 )
 
-    # print invariant quadratic forms
-    mt.p( 'iq_lst =' )
+    #
+    # output results
+    #
+    mt.p( 'info about subgroup G of Aut(P^1xP^1):', info )
+    mt.p( 'involution:', involution )
+    mt.p( 'vector space of G-invariant quadratic forms:' )
     for iq in iq_lst:
         mt.p( '\t', iq )
-
-    # print invariant quadratic forms
-    mt.p( 'pol_lst =' )
-    for pol in pol_lst:
-        mt.p( '\t', pol )
-
-    sig_lst = MARing.get_rand_sigs( pol_lst, 20 )
-    mt.p( sig_lst )
+    mt.p( 'signatures of random invariant quadratic forms:' )
+    mt.p( '\t', sig_lst )
+    mt.p( 'signatures of the form [1,n+1]:' )
+    for sig in sig_lst:
+        if 1 in sig:
+            mt.p( '\t', sig )
 
 
-def usecase__double_segre():
+def usecase__toric_invariant_celestials():
+    '''
+    OUTPUT:
+        - Compute celestials that are invariant under 
+          toric automorphisms
+    '''
+
+    R = PolynomialRing( QQ, ['x' + str( i ) for i in range( 9 )] )
+    x0, x1, x2, x3, x4, x5, x6, x7, x8 = R.gens()
+    lst = sage_eval( str( DSegre.get_ideal_lst() ), R.gens_dict() )
+    J = R.ideal( lst )
+
+    elim_lst = [1, 2]
+    xelim_lst = [sage_eval( 'x' + str( i ), R.gens_dict() ) for i in elim_lst]
+    J = J.elimination_ideal( xelim_lst )
+    R2 = PolynomialRing( QQ, ['x' + str( i ) for i in range( 9 ) if i not in elim_lst] )
+    J2 = R2.ideal( sage_eval( str( J.gens() ), R2.gens_dict() ) )
+    for gen in J2.gens():
+        mt.p( gen )
+    hpol = J2.hilbert_polynomial()
+    mt.p( hpol )
+
+
+
+def usecase__complex_classification():
     '''
     OUTPUT:
         - Prints a classification of quadratic forms
           that contain some fixed double Segre surface
           in projective 8-space, such that the quadratic
           form is invariant under subgroup of Aut(S).
+          We consider subgroups equivalent, if they are
+          complex conjugate in Aut(P^1xP^1).  
     '''
-    # surpresses warning message for slow toy implementation
-    # for Groebner basis.
-    #
-    set_verbose( -1 )
+
 
     c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
     for key in c_lst_lst_dct:
@@ -192,10 +186,13 @@ def usecase__double_segre():
 if __name__ == '__main__':
 
     mt.start_timer()
-    # mt.filter( '__main__.py' )
+    mt.filter( '__main__.py' )
+    set_verbose( -1 )  # surpresses warning message for slow for Groebner basis.
 
-    usecase__represent()
-    # usecase__double_segre()
+    # usecase__invariant_quadratic_forms()
+    usecase__toric_invariant_celestials()
+
+    # usecase__complex_classification()
 
 
 

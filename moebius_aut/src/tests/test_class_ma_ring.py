@@ -69,9 +69,9 @@ class TestMARing:
 
     def test__replace_conj_pairs( self ):
 
-        q_lst = ring( '[ x0-I*x1, x0+I*x1, x0+x2, x3*I]' )
+        q_lst = ring( '[ x0-I*x1, x0+I*x1, x0+x2, x3*I, x3+I*x4]' )
         new_lst = MARing.replace_conj_pairs( q_lst )
-        chk_lst = sorted( ring( '[ x0, x1, x0+x2, x3*I]' ) )
+        chk_lst = sorted( ring( '[ x0, x1, x0+x2, x3, x3+I*x4]' ) )
 
         print( q_lst )
         print( new_lst )

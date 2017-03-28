@@ -199,13 +199,13 @@ class TestClassDSegre:
         assert ig_lst == ring( '[2*q8 + 2*q12, 2*q4, q1 + q2 + q3, (-1/2)*q11 + 1/2*q15, 1/2*q10 + (-1/2)*q14, 2*q4, 1/2*q8 + 1/2*q12, (-1/2)*q18, (-1/2)*q16, q1 + q2 + q3, 1/2*q8 + 1/2*q12, q9 + q13, (-1/2)*q10 + 1/2*q14, 1/2*q11 + (-1/2)*q15, 1/2*q16, 1/2*q18, (-1/2)*q10 + 1/2*q14, -q8 - q12, (-1/2)*q1 - q2, -q4, 1/2*q11 + (-1/2)*q15, -q8 - q12, -q4, (-1/2)*q1 - q3, 1/2*q16, -q4, (-1/2)*q8, (-1/2)*q11 + 1/2*q15, (-1/2)*q18, (-1/2)*q1 - q2, (-1/2)*q8, (-1/2)*q9 + (-1/2)*q13, 1/2*q18, -q4, (-1/2)*q12, 1/2*q10 + (-1/2)*q14, (-1/2)*q16, (-1/2)*q1 - q3, (-1/2)*q9 + (-1/2)*q13, (-1/2)*q12]' )
 
 
-    def test__get_invariant_ideal__SO2xSO2( self ):
+    def test__get_invariant_qf__SO2xSO2( self ):
         k = ring( 'k' )
         c_lst_lst = []
         c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
         c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
 
-        iqf_lst = DSegre.get_invariant_ideal( c_lst_lst )
+        iqf_lst = DSegre.get_invariant_qf( c_lst_lst )
         print( iqf_lst )
         assert iqf_lst == ring( '[x0^2 - x7*x8, x0^2 - x5*x6, x0^2 - x3*x4, x0^2 - x1*x2]' )
 
@@ -239,7 +239,7 @@ class TestClassDSegre:
              s += DSegre.to_str( c_lst_lst ) + ', '
         s = s[:-2] + ' ]'
         print( s )
-        assert s == '[ < g1, g3 >, < g1, t1 >, < g1, t3 >, < g3, t3 >, < g1xt3, t1 >, < g3xt3, t1 >, < g1xt1, g3xt3 > ]'
+        assert s == '[ < t1, s1 >, < t1, t2 >, < t1, s2 >, < s1, s2 >, < t1xs2, t2 >, < s1xs2, t2 >, < t1xt2, s1xs2 > ]'
 
 
     def test__get_aut_P8__action_of_involution( self ):
@@ -286,4 +286,69 @@ class TestClassDSegre:
         assert RMR_chk == RMR
 
 
+    def test__get_aut_P8__rotation_matrix( self ):
+        '''
+        OUTPUT:
+            - We verify that for the 1-parameter subgroup of rotations 
+              with matrix
+              
+                  [ cos(k) -sin(k) ]
+                  [ sin(k)  cos(k) ]
+            
+              it is for our Lie algebra methods sufficient to consider 
+              1-parameter subgroups that have the same tangent vector
+              at the identity. Note that for k=0 we need to get the identity
+              and the determinant should be 1.   
+        '''
+        k = ring( 'k' )
+        I = ring( 'I' )
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        x = MARing.x()
+        q = MARing.q()
+        r = MARing.r()
+
+
+        #
+        # We consider the representation of the
+        # following matrix into P^8
+        #
+        #   (  [ 1 -k ] ,  [ 1 0 ] )
+        #   (  [ k  1 ]    [ 0 1 ] )
+        #
+        # We define A to be the tangent vector at the
+        # identity of this representation
+        #
+        N = DSegre.get_aut_P8( [1, -k, k , 1] + [1, 0, 0, 1] )
+        A = MARing.diff_mat( N, k ).subs( {k:0} )
+
+
+        #
+        # We consider the representation of the
+        # following matrix into P^8
+        #
+        #   (  [ cos(k) -sin(k) ] ,  [ 1 0 ] )
+        #   (  [ sin(k)  cos(k) ]    [ 0 1 ] )
+        #
+        # We define B to be the tangent vector at the
+        # identity of this representation
+        #
+        M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
+
+        a, b, c, d, e, f, g, h = var( 'a, b, c, d, e, f, g, h' )
+        k = var( 'k' )
+        M = sage_eval( str( list( M ) ), {'a':a, 'b':b, 'c':c, 'd':d, 'e':e, 'f':f, 'g':g, 'h':h, 'k':k} )
+        M = matrix( M )
+        M = M.subs( {a:cos( k ), b:-sin( k ), c:sin( k ), d:cos( k ), e:1, f:0, g:0, h:1} )
+
+        # differentiate the entries of M wrt. k
+        dmat = []
+        for row in M:
+            drow = []
+            for col in row:
+                drow += [ diff( col, k ) ]
+            dmat += [drow]
+        M = matrix( dmat )
+        B = M.subs( {k:0} )
+
+        assert str( A ) == str( B )
 

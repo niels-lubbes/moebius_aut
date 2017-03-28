@@ -280,7 +280,9 @@ class MARing:
         OUTPUT:
             - If there is a pair of complex conjugate polynomials 
               (q1,q2) with q1 and q2 in "q_lst" then this pair is 
-              replaced by ((q1+q2)/2,((q1-q2)*I)/(-2)).  
+              replaced by ((q1+q2)/2,((q1-q2)*I)/(-2)). 
+              Moreover, if -I*q is real for some q in "q_lst" 
+              then q is replaced by -I*q.  
         '''
         I = ring( 'I' )
 
@@ -288,7 +290,11 @@ class MARing:
         r_lst = []
         for q in q_lst:
             if 'I' in str( q ):
-                c_lst += [q]
+
+                if 'I' not in str( -I * q ):
+                    r_lst += [ -I * q ]
+                else:
+                    c_lst += [q]
             else:
                 r_lst += [q]
 
