@@ -210,6 +210,17 @@ class TestClassDSegre:
         assert iqf_lst == ring( '[x0^2 - x7*x8, x0^2 - x5*x6, x0^2 - x3*x4, x0^2 - x1*x2]' )
 
 
+    def test__get_invariant_qf__5678_SO2xSO2( self ):
+        k = ring( 'k' )
+        c_lst_lst = []
+        c_lst_lst += [[k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]]
+        c_lst_lst += [[1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]]
+
+        iqf_lst = DSegre.get_invariant_qf( c_lst_lst, [5, 6, 7, 8] )
+        print( iqf_lst )
+        assert iqf_lst == ring( '[x0^2 - x1*x2, x0^2 - x3*x4]' )
+
+
     def test__get_c_lst_lst_dct( self ):
         k = ring( 'k' )
         c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
@@ -351,4 +362,9 @@ class TestClassDSegre:
         B = M.subs( {k:0} )
 
         assert str( A ) == str( B )
+
+
+
+# if __name__ == '__main__':
+#    TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
 

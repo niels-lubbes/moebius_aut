@@ -105,13 +105,17 @@ class MARing:
         spol_lst = [ SR( str( pol ) ) for pol in pol_lst ]
         svar_lst = [ SR( str( var ) ) for var in var_lst ]
         dct = solve( spol_lst, svar_lst, solution_dict = True )[0]
-        MATools.p( 'dct =', dct )
+        MATools.p( 'pol_lst =', pol_lst )
+        MATools.p( 'var_lst =', var_lst )
+        MATools.p( 'dct     =', dct )
 
         # construct a list with integers i such
         # ri is occuring in the "dct" dictionary.
         #
         end_char_lst = []
         s = str( dct )
+        if pol_lst == []:  # ci are used instead of ri
+            s = s.replace( 'c', 'r' )
         rn_lst = []
         i = 0
         while i < len( s ):
@@ -132,7 +136,7 @@ class MARing:
             i += 1
 
         MATools.p( 'end_char_lst =', end_char_lst )
-        MATools.p( 'rn_lst =', rn_lst )
+        MATools.p( 'rn_lst       =', rn_lst )
 
         # replace each occurence of r<i> with r<t>
         # where t=0,...,t19

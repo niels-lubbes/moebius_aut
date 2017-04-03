@@ -47,7 +47,7 @@ class DSegre( object ):
               x2 x0 x1
               x6 x4 x7  
         
-        If we compose with the projection 
+        For example, if we compose with the projection 
             (1:x1:x2:x3:x4:x5:x6:x7:x8)
              |->
             (1:x1:x2:x3:x4:x7:x8)
@@ -249,7 +249,7 @@ class DSegre( object ):
     def get_aut_P8( c_lst ):
         '''
         INPUT: 
-            -- "c_lst" - A list of length 8 with 
+            - "c_lst" -- A list of length 8 with 
                          elements c0,...,c7 in "MARing.FF". We 
                          assume that the pair of matrices 
                             ( [ c0 c1 ]   [ c4 c5 ] ) = (A,B) 
@@ -310,19 +310,24 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_qmat():
+    def get_qmat( exc_idx_lst = [] ):
         '''
+        INPUT:
+            - "exc_idx_lst" -- A list of integers in [0,8].      
+              
         OUTPUT:
             - Returns a symmetric 9x9 matrix with entries
               in the ring QQ[q0,...,q19] which is a subring 
               of "MARing.R". It represents the Gramm matrix 
-              of a quadratic form in the ideal of the 
-              double Segre surface.              
+              of a quadratic form in the ideal of the              
+              double Segre surface or a projection of 
+              the double Segre surface with ideal defined
+              by "get_ideal_lst( exc_idx_lst )".                        
         '''
         x = MARing.x()
         q = MARing.q()
 
-        g_lst = DSegre.get_ideal_lst()
+        g_lst = DSegre.get_ideal_lst( exc_idx_lst )
         qpol = 0
         for i in range( len( g_lst ) ):
             qpol += q[i] * g_lst[i]
@@ -334,10 +339,10 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_invariant_q_lst( c_lst ):
+    def get_invariant_q_lst( c_lst, exc_idx_lst = [] ):
         '''                        
         INPUT: 
-            -- "c_lst" - A list of length 8 with elements 
+            - "c_lst" -- A list of length 8 with elements 
                          c0,...,c7 in QQ(k), 
                          where QQ(k) is a subfield of "MARing.FF".
                          If we substitute k:=0 in the entries of 
@@ -348,9 +353,10 @@ class DSegre( object ):
                             ( [ c2 c3 ] , [ c6 c7 ] )                                   
                          with the property that 
                              c0*c3-c1*c2=c4*c7-c5*c6=1.   
+            - "exc_idx_lst" -- A list of integers in [0,8].                              
                                      
         OUTPUT:
-            -- Let H be the representation of the pair
+            -  Let H be the representation of the pair
                of matrices  
                
                     ( [ c0 c1 ]   [ c4 c5 ] ) 
@@ -370,8 +376,10 @@ class DSegre( object ):
                of "MARing.R". 
                
                Each point p in the zeroset V(J),
-               when substituted in the matrix ".get_qmat()",
-               defines a quadratic form in the ideal ".get_ideal_lst()"
+               when substituted in the matrix 
+                   ".get_qmat(exc_idx_lst)",
+               defines a quadratic form in the ideal 
+                   ".get_ideal_lst(exc_idx_lst)"
                that is preserved by the 1-parameter subgroup H.                                        
         '''
         # get representation of 1-parameter subgroup in Aut(P^8)
@@ -389,7 +397,7 @@ class DSegre( object ):
         # Here A denotes the matrix of a quadratic form
         # in the ideal of the double Segre surface S.
         #
-        A = DSegre.get_qmat()
+        A = DSegre.get_qmat( exc_idx_lst )
         Z = D.T * A + A * D
         iq_lst = [iq for iq in Z.list() if iq != 0 ]
 
@@ -397,30 +405,30 @@ class DSegre( object ):
 
 
     @staticmethod
-    def get_invariant_qf( c_lst_lst ):
+    def get_invariant_qf( c_lst_lst, exc_idx_lst = [] ):
         '''
-        INPUT:
-            -- "c_lst_lst"    - A list of "c_lst"-lists.
-                                A c_lst is a list of length 8 with elements 
-                                c0,...,c7 in QQ(k), 
-                                where QQ(k) is a subfield of "MARing.FF".
-                                If we substitute k:=0 in the entries of 
-                                "c_lst" then we should obtain the list:
-                                   [1,0,0,1,1,0,0,1].                                                                      
-                                A c_lst represents a pair of two matrices:                                
-                                   ( [ c0 c1 ]   [ c4 c5 ] ) 
-                                   ( [ c2 c3 ] , [ c6 c7 ] )                                   
-                                with the property that 
-                                    c0*c3-c1*c2=c4*c7-c5*c6=1.            
-                                    
+        INPUT:        
+          - "c_lst_lst" --  A list of "c_lst"-lists.
+                            A c_lst is a list of length 8 with elements 
+                            c0,...,c7 in QQ(k), 
+                            where QQ(k) is a subfield of "MARing.FF".
+                            If we substitute k:=0 in the entries of 
+                            "c_lst" then we should obtain the list:
+                                [1,0,0,1,1,0,0,1].                                                                      
+                            A c_lst represents a pair of two matrices:                                
+                                ( [ c0 c1 ]   [ c4 c5 ] ) 
+                                ( [ c2 c3 ] , [ c6 c7 ] )                                   
+                            with the property that 
+                                c0*c3-c1*c2=c4*c7-c5*c6=1.            
+          - "exc_idx_lst" -- A list of integers in [0,8].                                     
         OUTPUT:
-            -- A list of quadratic forms in the ideal of the double Segre 
-               surface S, such that the quadratic forms are invariant 
-               under the automorphisms of S as defined by "c_lst_lst"
-               and such that the quadratic forms generate the module of  
-               all invariant quadratic forms.   
-                           
-               For the ideal of all quadratic forms see ".get_ideal_lst()".              
+         -- A list of quadratic forms in the ideal of (a projection of) 
+            the double Segre surface S:
+                ".get_ideal_lst( exc_idx_lst )"
+            such that the quadratic forms are invariant 
+            under the automorphisms of S as defined by "c_lst_lst"
+            and such that the quadratic forms generate the module of  
+            all invariant quadratic forms. Note that Aut(S)=Aut(P^1xP^1).   
         '''
 
         # for verbose output
@@ -439,7 +447,7 @@ class DSegre( object ):
         #
         iq_lst = []
         for c_lst in c_lst_lst:
-            iq_lst += DSegre.get_invariant_q_lst( c_lst )
+            iq_lst += DSegre.get_invariant_q_lst( c_lst, exc_idx_lst )
         iq_lst = list( MARing.R.ideal( iq_lst ).groebner_basis() )
 
         # solve the ideal defined by "iq_lst"
@@ -447,9 +455,9 @@ class DSegre( object ):
         sol_dct = MARing.solve( iq_lst, q )
 
         # substitute the solution in the quadratic form
-        # associated to "get_q_mat()".
+        # associated to the symmetric matrix qmat.
         #
-        qmat = DSegre.get_qmat()
+        qmat = DSegre.get_qmat( exc_idx_lst )
         qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
         sqpol = qpol.subs( sol_dct )
         mt.p( 'sqpol   =', sqpol )

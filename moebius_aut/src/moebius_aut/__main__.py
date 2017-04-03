@@ -13,23 +13,34 @@ from class_dsegre import DSegre
 mt = MATools()
 
 
-def usecase__invariant_quadratic_forms( case = 2 ):
+def usecase__invariant_quadratic_forms( case ):
     '''
+    INPUT:
+        - "case" -- Three numerical characters, which characterize
+                    the projection of a double Segre surface in S^n.
+                    For example 
+                        '078', 
+                    means 
+                        #families=0, #n=7, #degree=8.
+                    If several examples are considered for the same
+                    triple then we extend with a character in [a-z].
+                    These are currently implemented cases:
+                    
+                    ['087','287','365','265s','265t','443','243ss','243st']
+                    
     OUTPUT:
-        - Let G be a subgroup of Aut(P^1xP^1)
-          Compute the vectors space of G-invariant quadratic forms in
-          the ideal of the double Segre surface.
-          For "DSegre.change_basis()" for the specification
-          of involutions.
-          
-            case==1: 
-                G = Aut(P^1xP^1)
-                involution = 'identity' 
+      - Let G be a subgroup of Aut(P^1xP^1)
+        Compute the vectors space of real G-invariant quadratic forms in
+        the ideal of a (projection of) the double Segre surface
+        obtained by the method:
+            "DSegre.get_ideal_lst( exc_idx_lst )"
+                   
+        The real structure is specified in terms of an involution. See 
+            "DSegre.change_basis()" 
+        for the specification of involutions.
         
-            case==2:
-                G = toric automorphisms of P^1xP^1
-                involution = 'rotate'
-                  
+        See in the code for a description of each of the cases of
+        projections of double Segre surfaces that we consider.                
     '''
 
     #
@@ -74,15 +85,106 @@ def usecase__invariant_quadratic_forms( case = 2 ):
     # "c_lst_lst" represents a subgroup G of Aut(P^1xP^1) as a list of
     # 1-parameter subgroups that generate G.
     #
-    if case == 1:
+    if case == '087':
+        descr = '''
+                This example shows that there exists a 
+                quadric of signature (4,5) that is invariant
+                under the full automorphism group of S.
+                '''
+        infoG = 'SL(2) x SL(2):  [t + e, q + e, s + e, e + t, e + q, e + s ]'
+        exc_idx_lst = []
         c_lst_lst = [t + e, q + e, s + e, e + t, e + q, e + s ]
         involution = 'identity'
-        info = 'SL2+SL2'
 
-    elif case == 2:
+
+    elif case == '287':
+        descr = '''
+                This example shows quadrics of signatures (1,8), 
+                (1,6) and (1,4) in the ideal of the double Segre
+                surface, that are invariant under a 2-dimensional 
+                group of toric Moebius automorphisms.         
+                '''
+        infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
+        exc_idx_lst = []
         c_lst_lst = [ s + e, e + s ]
         involution = 'rotate'
-        info = 'toric'
+
+
+    elif case == '365':
+        descr = '''
+                This example shows that there exists a smooth sextic Del Pezzo 
+                surface in S^5 that is invariant under a 2-dimensional group 
+                of toric Moebius automorphisms.
+                '''
+        infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
+        exc_idx_lst = [5, 6]
+        c_lst_lst = [ s + e, e + s ]
+        involution = 'rotate'
+
+
+    elif case == '265s':
+        descr = ''' 
+                This example shows that there exists a singular sextic 
+                Del Pezzo surface in S^5 that is invariant under a 1-dimensional 
+                group of toric Moebius automorphisms. Random signatures of type 
+                [1,n+1] with n>=3 found so far are: [1,4], [1,6].
+
+                If we extend the group with [e+s] then we obtain a quadric of 
+                signature [1,4]; this is the horn cyclide case with 
+                generators: x0^2 - x3*x4,  x0^2 - x1^2 - x2^2,  
+                
+                If we extend the group with [e+t] then we obtain a quadric of 
+                signature [1,4]; this is the spindle cyclide case with 
+                generators: x0^2 - x3*x4,  x4^2 - x6^2 - x7^2.                                  
+                '''
+        infoG = 'SO(2): [ s + e ]'
+        exc_idx_lst = [5, 8]
+        c_lst_lst = [ s + e ]
+        involution = 'leftright'
+
+
+    elif case == '265t':
+        descr = ''' 
+                This example indicates that there does not exists a singular 
+                sextic Del Pezzo surface in S^5 that is invariant under a 
+                1-dimensional group of Moebius translations. Random signatures 
+                of type [1,n+1] with n>=3 found so far are: [1,4].                                
+                '''
+        infoG = 'SO(2): [ e + t ]'
+        exc_idx_lst = [5, 8]
+        c_lst_lst = [ e + t ]
+        involution = 'leftright'
+
+
+    elif case == '443':
+        descr = '''
+                This example shows that the Clifford torus in S^4 admits a 
+                2-dimensional family of toric Moebius automorphisms. 
+                '''
+        infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
+        exc_idx_lst = [5, 6, 7, 8]
+        c_lst_lst = [ s + e, e + s ]
+        involution = 'rotate'
+
+    elif case == '243ss':
+        descr = ''' 
+                This example shows that the horn cyclide in S^4 admits a 
+                2-dimensional family of Moebius automorphisms.
+                '''
+        infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
+        exc_idx_lst = [5, 6, 7, 8]
+        c_lst_lst = [ s + e, e + s ]
+        involution = 'leftright'
+
+    elif case == '243st':
+        descr = ''' 
+                This example shows that the spindle cyclide in S^4 admits a 
+                2-dimensional family of Moebius automorphisms.
+                '''
+        infoG = 'SO(2) x SE(1): [ s + e, e + t ]'
+        exc_idx_lst = [1, 2, 5, 8]
+        c_lst_lst = [ s + e, e + t ]
+        involution = 'leftright'
 
     else:
         raise ValueError( 'Unknown case: ', case )
@@ -90,7 +192,7 @@ def usecase__invariant_quadratic_forms( case = 2 ):
     #
     # compute vector space of invariant quadratic forms
     #
-    iq_lst = DSegre.get_invariant_qf( c_lst_lst )
+    iq_lst = DSegre.get_invariant_qf( c_lst_lst, exc_idx_lst )
     iq_lst = DSegre.change_basis( iq_lst, involution )
     iq_lst = MARing.replace_conj_pairs( iq_lst )
 
@@ -103,17 +205,30 @@ def usecase__invariant_quadratic_forms( case = 2 ):
     #
     # output results
     #
-    mt.p( 'info about subgroup G of Aut(P^1xP^1):', info )
-    mt.p( 'involution:', involution )
-    mt.p( 'vector space of G-invariant quadratic forms:' )
+    while descr != descr.replace( '  ', ' ' ):
+        descr = descr.replace( '  ', ' ' )
+    mat_str = str( matrix( [[8, 3, 5], [2, 0, 1], [6, 4, 7]] ) )
+    new_mat_str = mat_str
+    for ei in exc_idx_lst:
+        new_mat_str = new_mat_str.replace( str( ei ), ' ' )
+    for ei in range( 0, 9 ):
+        new_mat_str = new_mat_str.replace( str( ei ), '*' )
+
+    mt.p( '\n' + 80 * '-' )
+    mt.p( 'case        :', case )
+    mt.p( 'description :\n', descr + '\n' + mat_str + '\n\n' + new_mat_str )
+    mt.p( 'G           :', infoG )
+    mt.p( 'exc_idx_lst :', exc_idx_lst )
+    mt.p( 'involution  :', involution )
+    mt.p( 'G-invariant quadratic forms:' )
     for iq in iq_lst:
         mt.p( '\t', iq )
-    mt.p( 'signatures of random invariant quadratic forms:' )
+    mt.p( 'random signatures:' )
     mt.p( '\t', sig_lst )
-    mt.p( 'signatures of the form [1,n+1]:' )
     for sig in sig_lst:
         if 1 in sig:
             mt.p( '\t', sig )
+    mt.p( '\n' + 80 * '-' )
 
 
 def usecase__toric_invariant_celestials():
@@ -224,6 +339,163 @@ def usecase__toric_invariant_celestials():
                 mt.p( '\t', hpol )
 
 
+def usecase__horn_and_spindle_cyclides():
+    '''
+    OUTPUT:
+        We consider the following cyclides with monomial
+        parametrization determined by the following lattice 
+        polygons:  
+        
+            [  *  ]        [  *  ]
+            [* * *]        [  *  ]
+            [  *  ]        [* * *]
+            
+         horn cyclide    spindle cyclide   
+         leftright       leftright  
+         (2,4,3)         (2,4,3)
+           
+        and 'leftright' involution act as a modular involution
+        with vertical symmetry axis. We use the following numbering 
+        (see DSegre.get_ideal_lst() and DSegre.change_basis()):
+                   
+            [8 3 5]
+            [2 0 1]
+            [6 4 7]                
+    '''
+    if False:
+        #
+        # G-invariant quadratic forms for horn cyclide
+        # (see usecase__invariant_quadratic_forms('243ss')):
+        #
+        # x0^2 - x3*x4
+        # x0^2 - x1^2 - x2^2
+        #
+        # We send x3 |--> a*(x4-x3)
+        #         x4 |--> a*(x4+x3)
+        #         where a=sqrt(1/2)
+        # followed by sending: x4 |--> x0, x0 |--> x4
+
+        a = ring( 'a' )
+        xv = x0, x1, x2, x3, x4 = ring( 'x0,x1,x2,x3,x4' )
+        y0, y1, y2, y3 = ring( 'y0,y1,y2,y3' )
+        m34 = matrix( MARing.R, [
+            [1, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, -a, a],
+            [0, 0, 0, a, a]] )
+        m04 = matrix( MARing.R, [
+            [0, 0, 0, 0, 1],
+            [0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [1, 0, 0, 0, 0]] )
+        m = m34 * m04
+        v = vector( xv )
+        g1 = ring( 'x0^2 - x3*x4' )
+        g2 = ring( 'x0^2 - x1^2 - x2^2' )
+        mat1 = invariant_theory.quadratic_form( g1, xv ).as_QuadraticForm().matrix()
+        mat2 = invariant_theory.quadratic_form( g2, xv ).as_QuadraticForm().matrix()
+        ng1 = v.row() * m.T * mat1 * m * v.column()
+        ng2 = v.row() * m.T * mat2 * m * v.column()
+        G1 = SR( str( ng1[0] ) ).subs( {SR( 'a' ):1 / sqrt( 2 )} )
+        G2 = SR( str( ng2[0] ) ).subs( {SR( 'a' ):1 / sqrt( 2 )} )
+
+        S = PolynomialRing( QQ, var( 'x0,x1,x2,x3,x4,y0,y1,y2,y3' ) )
+        x0, x1, x2, x3, x4, y0, y1, y2, y3 = S.gens()
+        G1 = sage_eval( str( G1 ), S.gens_dict() )
+        G2 = sage_eval( str( G2 ), S.gens_dict() )
+        assert G1 in S
+        assert G2 in S
+        smap = [y0 - ( x0 - x3 ), y1 - x1, y2 - x2, y3 - x4]
+        prj_lst = ideal( [G1, G2] + smap ).elimination_ideal( [x0, x1, x2, x3, x4] ).gens()
+        eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
+
+        mt.p( 80 * '-' )
+        mt.p( 'HORN CYCLIDE' )
+        mt.p( 80 * '-' )
+        mt.p( 'We define a projective automorphism m:P^4--->P^4' )
+        mt.p( '\t a   = 1/sqrt(2)' )
+        mt.p( '\t m34 =', list( m34 ) )
+        mt.p( '\t m04 =', list( m04 ) )
+        mt.p( '\t m = m34 * m04 =', list( m ) )
+        mt.p( '\t det(m) =', det( m ) )
+        mt.p( '\t v |--> m*v =', v, '|-->', m * v )
+        mt.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
+        mt.p( '\t g1 =', g1 )
+        mt.p( '\t g2 =', g2 )
+        mt.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
+        mt.p( '\t G1 =', G1 )
+        mt.p( '\t G2 =', G2 )
+        mt.p( '\t G2-2*G1 =', G2 - 2 * G1 )
+        mt.p( 'Stereographic projection to circular quadratic cone:' )
+        mt.p( '\t smap    =', smap, '(stereographic projection map)' )
+        mt.p( '\t prj_lst =', prj_lst )
+        mt.p( '\t eqn     =', eqn )
+        mt.p( 80 * '-' + 2 * '\n' )
+
+    if True:
+        #
+        # G-invariant quadratic forms for spindle cyclides
+        # (see usecase__invariant_quadratic_forms('243st')):
+        #
+        # x0^2 - x3*x4
+        # x4^2 - x6^2 - x7^2
+        #
+
+        a = ring( 'a' )
+        xv = x0, x3, x4, x6, x7 = ring( 'x0,x3,x4,x6,x7' )
+        y0, y1, y2, y3 = ring( 'y0,y1,y2,y3' )
+        m = matrix( MARing.R, [
+            [a, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0],
+            [0, -1, -1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 1]] )
+        v = vector( xv )
+        g1 = ring( 'x0^2 - x3*x4' )
+        g2 = ring( 'x4^2 - x6^2 - x7^2' )
+        mat1 = invariant_theory.quadratic_form( g1, xv ).as_QuadraticForm().matrix()
+        mat2 = invariant_theory.quadratic_form( g2, xv ).as_QuadraticForm().matrix()
+        ng1 = v.row() * m.T * mat1 * m * v.column()
+        ng2 = v.row() * m.T * mat2 * m * v.column()
+        G1 = SR( str( ng1[0] ) ).subs( {SR( 'a' ):1 / sqrt( 2 )} )
+        G2 = SR( str( ng2[0] ) ).subs( {SR( 'a' ):1 / sqrt( 2 )} )
+
+        S = PolynomialRing( QQ, var( 'x0,x3,x4,x6,x7,y0,y1,y2,y3' ) )
+        x0, x3, x4, x6, x7, y0, y1, y2, y3 = S.gens()
+        G1 = sage_eval( str( G1 ), S.gens_dict() )
+        G2 = sage_eval( str( G2 ), S.gens_dict() )
+        assert G1 in S
+        assert G2 in S
+        smap = [y0 - ( x4 + x3 ), y1 - x0, y2 - x7, y3 - x6]  # +x4^2-x0^2-x3^2-x6^2-x7^2
+        prj_lst = S.ideal( [G1, G2] + smap ).elimination_ideal( [x0, x3, x4, x6, x7] ).gens()
+        eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
+
+
+        mt.p( 80 * '-' )
+        mt.p( 'SPINDLE CYCLIDE' )
+        mt.p( 80 * '-' )
+        mt.p( 'We define a projective automorphism m:P^4--->P^4' )
+        mt.p( '\t a   = 1/sqrt(2)' )
+        mt.p( '\t m =', list( m ) )
+        mt.p( '\t det(m) =', det( m ) )
+        mt.p( '\t v |--> m*v =', v, '|-->', m * v )
+        mt.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
+        mt.p( '\t g1 =', g1 )
+        mt.p( '\t g2 =', g2 )
+        mt.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
+        mt.p( '\t G1 =', G1 )
+        mt.p( '\t G2 =', G2 )
+        mt.p( '\t G2-2*G1 =', G2 - 2 * G1 )
+        mt.p( 'Stereographic projection to circular cylinder:' )
+        mt.p( '\t smap    =', smap, '(stereographic projection map)' )
+        mt.p( '\t prj_lst =', prj_lst )
+        mt.p( '\t eqn     =', eqn )
+        mt.p( 80 * '-' + 2 * '\n' )
+
+
+
 def usecase__complex_classification():
     '''
     OUTPUT:
@@ -277,8 +549,10 @@ if __name__ == '__main__':
     # (un)comment usecases for this package below #
     ###############################################
 
-    usecase__invariant_quadratic_forms()
-    usecase__toric_invariant_celestials()
+    # for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
+    #    usecase__invariant_quadratic_forms( case )
+    # usecase__toric_invariant_celestials()
+    usecase__horn_and_spindle_cyclides()
     # usecase__complex_classification() # takes some time
 
     ###############################################

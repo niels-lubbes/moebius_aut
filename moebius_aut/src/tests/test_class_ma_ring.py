@@ -62,6 +62,23 @@ class TestMARing:
         print( sol_dct )
         assert 'r0' in str( sol_dct )
 
+        # We call a second time so that sage internally
+        # introduces new variable names. We undo this
+        # in MARing.solve(), since we work in a
+        # polynomial ring where we want to minimize
+        # the number of variables.
+        #
+        sol_dct = MARing.solve( pol_lst, var_lst )
+        print( sol_dct )
+        assert 'r0' in str( sol_dct )
+
+
+    def test__solve__empty_list( self ):
+
+        q = MARing.q()
+        pol_lst = []
+        var_lst = [ q[i] for i in [0, 1, 2]]
+
         sol_dct = MARing.solve( pol_lst, var_lst )
         print( sol_dct )
         assert 'r0' in str( sol_dct )
