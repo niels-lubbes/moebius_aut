@@ -9,6 +9,7 @@ from class_ma_tools import MATools
 from class_ma_ring import ring
 from class_ma_ring import MARing
 from class_dsegre import DSegre
+from class_veronese import Veronese
 
 mt = MATools()
 
@@ -52,7 +53,8 @@ def usecase__invariant_quadratic_forms( case ):
     U, V = k + 1, 1 / ( k + 1 )
 
     #
-    # generators for real 1-parameter subgroups of Aut(P^1).
+    # Real 1-parameter subgroups of Aut(P^1)
+    # --------------------------------------
     #
     # For our algorithms only the tangent vectors of these
     # 1-parameter subgroups at the identity are relevant.
@@ -71,6 +73,12 @@ def usecase__invariant_quadratic_forms( case ):
     # under involution R2.
     #
     # Note that t are scaling wrt. R1 but rotations wrt. R2.
+    #
+    # We consider a 1-parameter subgroup which has at the identity
+    # the same tangent vector as the 1-parameter subgroup
+    #
+    #  ( [ cos(k) -sin(k) ] , [ 1 0 ] )
+    #  ( [ sin(k)  cos(k) ]   [ 0 1 ] )
     #
     t = [1, k, 0, 1]  # translation wrt. R1
     q = [1, 0, k, 1]  #
@@ -539,6 +547,119 @@ def usecase__complex_classification():
             mt.p( '\t', 10 * '-' )
 
 
+def usecase__invariant_quadratic_forms_veronese( case ):
+    '''
+    INPUT:
+      - "case" -- A string representing the name of a group G.
+                  The string should be either:
+                  ['1a','1b','sl3','so3'] 
+                
+    
+    OUTPUT:
+      - Let G be a subgroup of Aut(P^2)
+        Compute the vectors space of real G-invariant quadratic forms in
+        the ideal of the Veronese surface in projective 5-space P^5
+        obtained by the method "Veronese.get_ideal_lst()".
+                   
+        The real structure is specified in terms of an involution. We have
+        two equivalent choices for the involution. Either we can use 
+        "Veronese.get_change_basis()" or we consider the usual complex conjugation. 
+        
+        See the code below for a description of the cases.
+    '''
+    #
+    # We initialize 1-parameter subgroups of SL3, whose tangent vectors at the
+    # identity generate Lie subalgebras of sl3(RR) and sl3(CC).
+    #
+    sl3_lst = h1, h2, a1, a2, a3, b1, b2, b3 = Veronese.get_c_lst_lst_dct()['SL3(C)']
+    so3_lst = r1, r2, r3 = Veronese.get_c_lst_lst_dct()['SO3(R)']
+
+    if case == '1a':
+        descr = '''
+                This example shows that there exists a quadric of signature 
+                (1,5) in the ideal of the Veronese surface, with the involution
+                that induces the involution (a,b)|->(b,a) on the lattice polygon
+                of the Veronese surface. 
+                '''
+        infoG = 'trivial group'
+        c_lst_lst = []
+        involution = 'diagonal'
+
+    elif case == '1b':
+        descr = '''
+                This example shows that there exists a quadric of signature 
+                (1,5) in the ideal of the Veronese surface, with the involution
+                that induces the identity (a,b)|->(a,b) on the lattice polygon
+                of the Veronese surface. 
+                '''
+        infoG = 'trivial group'
+        c_lst_lst = []
+        involution = 'identity'
+
+    elif case == 'sl3':
+        descr = '''
+                This example shows that there exists no quadric that is invariant 
+                under the full automorphism group of the Veronese surface.
+                '''
+        infoG = 'SL3(C):  [h1, h2, a1, a2, a3, b1, b2, b3]'
+        c_lst_lst = sl3_lst
+        involution = 'identity'
+
+    elif case == 'so3':
+        descr = '''
+                This example shows that there exists a quadric of signature 
+                (1,5) in the ideal of the Veronese surface, such that this 
+                quadric is invariant under the group SO(3)               
+                '''
+        infoG = 'SO3(R):  [r1, r2, r3]'
+        c_lst_lst = so3_lst
+        involution = 'identity'
+
+    else:
+        raise ValueError( 'Unknown case:', case )
+
+
+    #
+    # compute vector space of invariant quadratic forms
+    #
+    iq_lst = Veronese.get_invariant_qf( c_lst_lst )
+
+    if involution == 'diagonal':
+        iq_lst = Veronese.change_basis( iq_lst )
+        iq_lst = MARing.replace_conj_pairs( iq_lst )
+    elif involution == 'identity':
+        pass
+    else:
+        raise ValueError( 'Incorrect involution: ', involution )
+
+    #
+    # computes signatures of random quadrics in
+    # the vector space of invariant quadratic forms.
+    #
+    sig_lst = MARing.get_rand_sigs( iq_lst, 5 )
+
+    #
+    # output results
+    #
+    while descr != descr.replace( '  ', ' ' ):
+        descr = descr.replace( '  ', ' ' )
+    mt.p( '\n' + 80 * '-' )
+    mt.p( 'case        :', case )
+    mt.p( 'description :\n', descr )
+    mt.p( 'G           :', infoG )
+    mt.p( 'involution  :', involution )
+    mt.p( 'G-invariant quadratic forms:' )
+    for iq in iq_lst:
+        mt.p( '\t', iq )
+    mt.p( 'random signatures:' )
+    mt.p( '\t', sig_lst )
+    for sig in sig_lst:
+        if 1 in sig:
+            mt.p( '\t', sig )
+    mt.p( '\n' + 80 * '-' )
+
+
+
 if __name__ == '__main__':
 
     mt.start_timer()
@@ -552,8 +673,11 @@ if __name__ == '__main__':
     # for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
     #    usecase__invariant_quadratic_forms( case )
     # usecase__toric_invariant_celestials()
-    usecase__horn_and_spindle_cyclides()
+    # usecase__horn_and_spindle_cyclides()
     # usecase__complex_classification() # takes some time
+
+    for case in ['1a', '1b', 'sl3', 'so3']:
+        usecase__invariant_quadratic_forms_veronese( case )
 
     ###############################################
 

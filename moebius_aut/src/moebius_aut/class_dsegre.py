@@ -65,7 +65,12 @@ class DSegre( object ):
                   QQ[x0,...,x8] 
               of the ring represented by "MARing.R".
               For each index i in "exc_idx_lst" the 
-              generators that contain xi are omitted.  
+              generators that contain xi are omitted.
+
+              The generators for the ideal are all quadratic forms
+              and also form a vector space over CC of all quadratic 
+              forms that contain (a projection of) the double 
+              Segre surface.                                
         '''
 
         s_lst = []
@@ -254,9 +259,7 @@ class DSegre( object ):
                          assume that the pair of matrices 
                             ( [ c0 c1 ]   [ c4 c5 ] ) = (A,B) 
                             ( [ c2 c3 ] , [ c6 c7 ] )                                                                                                                                                         
-                         represent an automorphism of P^1xP^1
-                         where both matrices are assumed to be
-                         normalized to have determinant 1. 
+                         represent an automorphism of P^1xP^1.
                                                              
         OUTPUT:
             - This method returns a 9x9 matrix defined over "MARing.FF",
@@ -342,18 +345,24 @@ class DSegre( object ):
     def get_invariant_q_lst( c_lst, exc_idx_lst = [] ):
         '''                        
         INPUT: 
-            - "c_lst" -- A list of length 8 with elements 
-                         c0,...,c7 in QQ(k), 
-                         where QQ(k) is a subfield of "MARing.FF".
-                         If we substitute k:=0 in the entries of 
-                         "c_lst" then we should obtain the list:
-                                [1,0,0,1,1,0,0,1].                                                                                  
-                         A c_lst represents a pair of two matrices:                                
+          - "c_lst" --  A list of length 8 with elements 
+                        c0,...,c7 in QQ(k), 
+                        where QQ(k) is a subfield of "MARing.FF".
+                        If we substitute k:=0 in the entries of 
+                        "c_lst" then we should obtain the list:
+                            [1,0,0,1,1,0,0,1].                                                                                  
+                        A c_lst represents a pair of two matrices:                                
                             ( [ c0 c1 ]   [ c4 c5 ] ) 
                             ( [ c2 c3 ] , [ c6 c7 ] )                                   
-                         with the property that 
-                             c0*c3-c1*c2=c4*c7-c5*c6=1.   
-            - "exc_idx_lst" -- A list of integers in [0,8].                              
+                        with the property that 
+                            c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0. 
+                        If the two matrices are not normalized
+                        to have determinant 1 then the method should be 
+                        taken with care (it should be checked that the
+                        tangent vectors at the identity generate the 
+                        correct Lie algebra).                                                    
+                            
+          - "exc_idx_lst" -- A list of integers in [0,8].                              
                                      
         OUTPUT:
             -  Let H be the representation of the pair
@@ -419,7 +428,12 @@ class DSegre( object ):
                                 ( [ c0 c1 ]   [ c4 c5 ] ) 
                                 ( [ c2 c3 ] , [ c6 c7 ] )                                   
                             with the property that 
-                                c0*c3-c1*c2=c4*c7-c5*c6=1.            
+                                c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0.
+                            If the two matrices are not normalized
+                            to have determinant 1 then the method should be 
+                            taken with care (it should be checked that the
+                            tangent vectors at the identity generate the 
+                            correct Lie algebra).                                             
           - "exc_idx_lst" -- A list of integers in [0,8].                                     
         OUTPUT:
          -- A list of quadratic forms in the ideal of (a projection of) 
@@ -494,8 +508,7 @@ class DSegre( object ):
               
               This pair represent a 1-parameter subgroup G 
               (with parameter k) in Aut(P^1xP^1).
-              Both matrices are normalized to have determinant 1 
-              and is the identity automorphism at k=0. 
+              Both matrices are the identity automorphism when k=0. 
               
               For example SO(2)xSO(2) in Aut(P^1xP^1) has two generators:
               
