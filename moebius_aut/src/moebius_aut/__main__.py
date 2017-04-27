@@ -179,7 +179,7 @@ def usecase__invariant_quadratic_forms( case ):
                 This example shows that the horn cyclide in S^4 admits a 
                 2-dimensional family of Moebius automorphisms.
                 '''
-        infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
+        infoG = 'SO(2) x SE(1): [ s + e, e + s ]'
         exc_idx_lst = [5, 6, 7, 8]
         c_lst_lst = [ s + e, e + s ]
         involution = 'leftright'
@@ -370,7 +370,7 @@ def usecase__horn_and_spindle_cyclides():
             [2 0 1]
             [6 4 7]                
     '''
-    if False:
+    if True:
         #
         # G-invariant quadratic forms for horn cyclide
         # (see usecase__invariant_quadratic_forms('243ss')):
@@ -672,12 +672,12 @@ if __name__ == '__main__':
 
     # for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
     #    usecase__invariant_quadratic_forms( case )
-    # usecase__toric_invariant_celestials()
+    usecase__toric_invariant_celestials()
     # usecase__horn_and_spindle_cyclides()
     # usecase__complex_classification() # takes some time
 
-    for case in ['1a', '1b', 'sl3', 'so3']:
-        usecase__invariant_quadratic_forms_veronese( case )
+    # for case in ['1a', '1b', 'sl3', 'so3']:
+    #    usecase__invariant_quadratic_forms_veronese( case )
 
     ###############################################
 

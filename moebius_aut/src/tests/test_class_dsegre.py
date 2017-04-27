@@ -254,7 +254,13 @@ class TestClassDSegre:
 
 
     def test__get_aut_P8__action_of_involution( self ):
-
+        '''
+        OUPUT:
+            -   We check how the action of the involution J: P^8---->P^8 acts on 
+                elements "c_lst" in Aut(P^1xP^1) by conjugation. See documentation 
+                "DSegre.change_basis()" and "DSegre.get_aut_P8()" for our internal 
+                implementation of J and "c_lst" respectively.              
+        '''
         a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
 
         # left-right involution
@@ -365,6 +371,7 @@ class TestClassDSegre:
 
 
 
-# if __name__ == '__main__':
-#    TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
+if __name__ == '__main__':
+    TestClassDSegre().test__get_aut_P8__action_of_involution()
+    #    TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
 

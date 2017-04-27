@@ -450,10 +450,6 @@ class Veronese( object ):
               k, 0, 1]
 
 
-
-        h = QQ( 1 ) / 2
-        m = 1 / k
-
         r1 = [  1, k, 0,
               - k, 1, 0,
                 0, 0, 1]
