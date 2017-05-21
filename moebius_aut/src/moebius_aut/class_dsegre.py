@@ -486,9 +486,82 @@ class DSegre( object ):
 
         return iqf_lst
 
+    @staticmethod
+    def get_gens_sl2():
+        '''
+        OUTPUT:
+          - A list of lists L of length 4 with elements c0,...,c3 in QQ(k)
+            where the function field QQ(k) is a subfield of "MARing.FF".
+            If we substitute k:=0 in the entries of L then we obtain 
+            the list [1,0,0,1]. A list L represent a 2x2 matrix
+                [ c0 c1 ]
+                [ c2 c3 ]
+            with the property that c0*c3-c1*c2=0.
+              
+            The antiholomorphic involution coming from the real
+            structure induces---up to conjugacy---two possible 
+            antiholomorphic involutions acting on the 2x2-matrices:
+                R0: [c0,c1,c2,c3] |--> [c0,c1,c2,c3] followed by complex conjugation.
+                R1: [c0,c1,c2,c3] |--> [c3,c2,c1,c0] followed by complex conjugation.              
+              
+            A list L represents a real 1-parameter subgroup of PSL(2) wrt R0 or R1. 
+            We assume that we are only interested in the tangent vector of this 
+            subgroup at the identity. This tangent vector is an element in the 
+            Lie algebra sl(2). 
+            
+            For example for the rotations wrt. R0 we have that  
+                [ cos(k) -sin(k) ]
+                [ sin(k)  cos(k) ]
+            but we represent this element by "r": 
+                [ 1  -k ]
+                [ k   1 ] 
+            because their tangent vectors at the identity coincide. 
+            
+            The 1-parameter subgroup of translations with real structure R0 
+            corresponds to "t":
+                [ 1  k ]
+                [ 0  1 ]
+            The corresponding element in the Lie algebra is 
+                [ 0  1 ]
+                [ 0  0 ]
+            and is conjugate to 
+                [  I   I ]
+                [ -I  -I ]
+            where I is the imaginary unit. This latter element is real wrt R1.
+            A 1-parameter subgroup which has---up to scalar multiplication---this 
+            element as tangent vector is "T":
+                [  k+1   k         ]
+                [ -k    (k+1)^(-1) ]
+                
+            See the code for an overview of generators L.
+            The tangent vectors of t, q and s generate the Lie algebra sl(2).  
+                                        
+        EXAMPLE:
+            t, q, s, r, e, T = DSegre.get_gens_sl2()
+            c_lst_lst = [s+e, e+s]
+            iq_lst = DSegre.get_invariant_qf( c_lst_lst, [] )
+            iq_lst = DSegre.change_basis( iq_lst, "rotate" )
+            iq_lst = MARing.replace_conj_pairs( iq_lst )
+            sig_lst = MARing.get_rand_sigs( iq_lst, 10 )            
+        '''
+        k = ring( 'k' )
+
+        a = k + 1
+        b = 1 / ( k + 1 )
+
+        t = [1, k, 0, 1]  # translation for R0
+        q = [1, 0, k, 1]
+        s = [a, 0, 0, b]  # scalings for R0/rotations for R1
+        r = [1, -k, k, 1]  # rotations for R0/scalings for R1
+        e = [1, 0, 0, 1]  # identity
+
+        T = [a, k, -k, b]  # translations for R1
+
+        return t, q, s, r, e, T
+
 
     @staticmethod
-    def get_c_lst_lst_dct():
+    def get_c_lst_lst_lst():
         '''
         OUTPUT:
               
@@ -512,8 +585,8 @@ class DSegre( object ):
               
               For example SO(2)xSO(2) in Aut(P^1xP^1) has two generators:
               
-                c_lst_0 = [k + 1, 0, 0, 1 / ( k + 1 ), 1, 0, 0, 1]
-                c_lst_1 = [1, 0, 0, 1, k + 1, 0, 0, 1 / ( k + 1 )]
+                c_lst_0 = [1, -k, k, 1, 1, 0, 0, 1]
+                c_lst_1 = [1, 0, 0, 1, 1, -k, k, 1]
 
               We now define c_lst_lst = [c_lst_0, c_lst_1].
               
@@ -521,85 +594,86 @@ class DSegre( object ):
               identity determines an element in the Lie algebra sl2+sl2 
               of Aut(P^1xP^1):
                
-                      [1, 0, 0, -1, 1, 0, 0, 1]
-                      [1, 0, 0, 1, 1, 0, 0, -1]
+                      [0, -1, 1, 0, 1, 0, 0, 1]
+                      [1, 0, 0, 1, 0, -1, 1, 0]
               
-              It is possible to classify all Lie subalgebra's
-              of sl2+sl2 up to conjugacy.
-                
-              Each Lie subalgebra with n>0 generators determines a c_lst_lst of
-              length n. Now "c_lst_lst_dct[n]" is a list of "c_lst_lst"-lists
-              of lenght n.   
-        
-              Thus this methods returns a dictionary whose keys are positive 
-              integers (1,2,3...) and each value is a list of c_lst_lst lists 
-              of length equal to the corresponding key. Each c_lst_lst is a list 
-              of "c_lst"-list and c_lst is as described above.                         
+              We assume that the antiholomorphic involution of the 
+              real structure acts as complex conjugation on the matrices.
+                            
+              The output is a list of "c_lst_lst" elements. 
+              Each "c_lst_lst" represent Lie subalgebra's of sl2+sl2 up to conjugacy.
+              Exactly one representative for each conjugacy class is contained in 
+              the output list.                                                                         
         '''
-        # define c_list of all possible of 1-parameter
-        # subgroups of Aut(P^1xP^1) up to conjugacy.
         #
-        k = ring( 'k' )
-
-        a = k + 1
-        b = 1 / ( k + 1 )
-
-        t1 = [1, k, 0, 1] + [1, 0, 0, 1]
-        q1 = [1, 0, k, 1] + [1, 0, 0, 1]
-        s1 = [a, 0, 0, b] + [1, 0, 0, 1]
-
-        t2 = [1, 0, 0, 1] + [1, k, 0, 1]
-        q2 = [1, 0, 0, 1] + [1, 0, k, 1]
-        s2 = [1, 0, 0, 1] + [a, 0, 0, b]
-
-        t1xt2 = [1, k, 0, 1] + [1, k, 0, 1]
-        q1xq2 = [1, 0, k, 1] + [1, 0, k, 1]
-        s1xs2 = [a, 0, 0, b] + [a, 0, 0, b]
-        t1xs2 = [1, k, 0, 1] + [a, 0, 0, b]
+        # obtain 1-parameter subgroups whose tangent vectors at the
+        # identity generates the Lie algebra sl(2)
+        #
+        t, q, s, r, e, T = DSegre.get_gens_sl2()
 
         # construct dictionary for string representation
         #
-        DSegre.__str_dct[str( t1 )] = 't1'
-        DSegre.__str_dct[str( q1 )] = 'q1'
-        DSegre.__str_dct[str( s1 )] = 's1'
+        DSegre.__str_dct[str( t + e )] = 't1'
+        DSegre.__str_dct[str( q + e )] = 'q1'
+        DSegre.__str_dct[str( s + e )] = 's1'
+        DSegre.__str_dct[str( r + e )] = 'r1'
+        DSegre.__str_dct[str( e + t )] = 't2'
+        DSegre.__str_dct[str( e + q )] = 'q2'
+        DSegre.__str_dct[str( e + s )] = 's2'
+        DSegre.__str_dct[str( e + r )] = 'r2'
 
-        DSegre.__str_dct[str( t2 )] = 't2'
-        DSegre.__str_dct[str( q2 )] = 'q2'
-        DSegre.__str_dct[str( s2 )] = 's2'
+        DSegre.__str_dct[str( t + t )] = 't1xt2'
+        DSegre.__str_dct[str( q + q )] = 'g1xq2'
+        DSegre.__str_dct[str( s + s )] = 's1xs2'
+        DSegre.__str_dct[str( r + r )] = 'r1xr2'
+        DSegre.__str_dct[str( r + s )] = 'r1xs2'
+        DSegre.__str_dct[str( s + r )] = 's1xr2'
+        DSegre.__str_dct[str( r + t )] = 'r1xt2'
+        DSegre.__str_dct[str( t + r )] = 't1xr2'
+        DSegre.__str_dct[str( s + t )] = 's1xt2'
+        DSegre.__str_dct[str( t + s )] = 't1xs2'
 
-        DSegre.__str_dct[str( t1xt2 )] = 't1xt2'
-        DSegre.__str_dct[str( q1xq2 )] = 'q1xq2'
-        DSegre.__str_dct[str( s1xs2 )] = 's1xs2'
-        DSegre.__str_dct[str( t1xs2 )] = 't1xs2'
-
-
-        # construct dictionary for output
+        # construct classification of real Lie subalgebras
         #
-        c_lst_lst_dct = {}
+        c_lst_lst_lst = []
 
-        c_lst_lst_dct[1] = [ [t1], [s1], [t1xt2], [s1xs2], [t1xs2] ]
+        # first projection is <t,q,s>
+        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t, e + q, e + s ]]
+        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t, e + s ]]
+        c_lst_lst_lst += [[ t + e, q + e, s + e, e + r ]]
+        c_lst_lst_lst += [[ t + e, q + e, s + e, e + s ]]
+        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t ]]
+        c_lst_lst_lst += [[ t + t, q + q, s + s ]]
+        c_lst_lst_lst += [[ t + e, q + e, s + e ]]
 
-        c_lst_lst_dct[2] = [ [t1, s1], [t1, t2],
-                             [t1, s2], [s1, s2],
-                             [t1xs2, t2], [s1xs2, t2],
-                             [t1xt2, s1xs2] ]
+        # first projection is <t,s>
+        c_lst_lst_lst += [[ t + e, s + e, e + t, e + s ]]
+        c_lst_lst_lst += [[ t + e, s + e, e + r ]]
+        c_lst_lst_lst += [[ t + e, s + e, e + s ]]
+        c_lst_lst_lst += [[ t + e, s + e, e + t ]]
+        c_lst_lst_lst += [[ t + t, s + s ]]
+        c_lst_lst_lst += [[ t + e, s + e ]]
 
-        c_lst_lst_dct[3] = [ [t1, q1, s1],
-                             [t1, t2, s2],
-                             [s1, t2, s2],
-                             [t1xt2, q1xq2, s1xs2],
-                             [t1, t2, s1xs2] ]
+        # first projection is <r>
+        c_lst_lst_lst += [[ r + e, e + r ]]
+        c_lst_lst_lst += [[ r + e, e + s ]]
+        c_lst_lst_lst += [[ r + e, e + t ]]
+        c_lst_lst_lst += [[ r + r ]]
+        c_lst_lst_lst += [[ r + s ]]
+        c_lst_lst_lst += [[ r + t ]]
+        c_lst_lst_lst += [[ r + e ]]
 
-        c_lst_lst_dct[4] = [ [t1, s1, t2, s2],
-                             [t1, q1, s1, t2],
-                             [t1, q1, s1, s2] ]
+        # first projection is <s>
+        c_lst_lst_lst += [[ s + e, e + s ]]
+        c_lst_lst_lst += [[ s + s ]]
+        c_lst_lst_lst += [[ s + t ]]
+        c_lst_lst_lst += [[ s + e ]]
 
-        c_lst_lst_dct[5] = [ [t1, q1, s1, t2, s2] ]
+        # first projection is <t>
+        c_lst_lst_lst += [[ t + e, e + t ]]
+        c_lst_lst_lst += [[ t + e ]]
 
-        c_lst_lst_dct[6] = [ [t1, q1, s1, t2, q2, s2]]
-
-
-        return c_lst_lst_dct
+        return c_lst_lst_lst
 
 
     @staticmethod
@@ -611,7 +685,7 @@ class DSegre( object ):
             - A string representation for "c_lst_lst".
         '''
         if DSegre.__str_dct == {}:
-            DSegre.get_c_lst_lst_dct()
+            DSegre.get_c_lst_lst_lst()
 
         s = '< '
         for c_lst in c_lst_lst:

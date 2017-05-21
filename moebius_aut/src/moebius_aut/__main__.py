@@ -45,47 +45,10 @@ def usecase__invariant_quadratic_forms( case ):
     '''
 
     #
-    # declare generators of 1-parameter subgroups in k
-    # such that k=0 is the identity.
+    # obtain 1-parameter subgroups whose tangent vectors at the
+    # identity generates the Lie algebra sl(2)
     #
-    k = ring( 'k' )
-    I = ring( 'I' )
-    U, V = k + 1, 1 / ( k + 1 )
-
-    #
-    # Real 1-parameter subgroups of Aut(P^1)
-    # --------------------------------------
-    #
-    # For our algorithms only the tangent vectors of these
-    # 1-parameter subgroups at the identity are relevant.
-    #
-    # For example if the involution is the identity then
-    # the 1-parameter subgroup r has the same tangent vector
-    # as the rotations [cos(k),-sin(k), sin(k), cos(k)].
-    #
-    # The antiholomorphic involution coming from the real
-    # structure induces---up to conjugacy---two possible involutions
-    # acting on the 2x2matrices:
-    #     R1: complex conjugation
-    #     R2: [a,b,c,d] --> [d,c,b,a] followed by complex conjugation.
-    #
-    # The 1-parameter subgroup i*T is conjugate to t and invariant
-    # under involution R2.
-    #
-    # Note that t are scaling wrt. R1 but rotations wrt. R2.
-    #
-    # We consider a 1-parameter subgroup which has at the identity
-    # the same tangent vector as the 1-parameter subgroup
-    #
-    #  ( [ cos(k) -sin(k) ] , [ 1 0 ] )
-    #  ( [ sin(k)  cos(k) ]   [ 0 1 ] )
-    #
-    t = [1, k, 0, 1]  # translation wrt. R1
-    q = [1, 0, k, 1]  #
-    s = [U, 0, 0, V]  # scalings (or rotations wrt. R2)
-    r = [1, -k, k, 1]  # rotations (or scalings wrt. R2)
-    e = [1, 0, 0, 1]  # identity
-    T = [U, k, -k, V]  # translations wrt. R2
+    t, q, s, r, e, T = DSegre.get_gens_sl2()
 
     #
     # "involution" is in { 'identity', 'leftright', 'rotate', 'diagonal' }
@@ -158,7 +121,7 @@ def usecase__invariant_quadratic_forms( case ):
                 1-dimensional group of Moebius translations. Random signatures 
                 of type [1,n+1] with n>=3 found so far are: [1,4].                                
                 '''
-        infoG = 'SO(2): [ e + t ]'
+        infoG = 'SE(1): [ e + t ]'
         exc_idx_lst = [5, 8]
         c_lst_lst = [ e + t ]
         involution = 'leftright'
@@ -166,7 +129,7 @@ def usecase__invariant_quadratic_forms( case ):
 
     elif case == '443':
         descr = '''
-                This example shows that the Clifford torus in S^4 admits a 
+                This example shows that the ring cyclide in S^3 admits a 
                 2-dimensional family of toric Moebius automorphisms. 
                 '''
         infoG = 'SO(2) x SO(2): [ s + e, e + s ]'
@@ -176,17 +139,17 @@ def usecase__invariant_quadratic_forms( case ):
 
     elif case == '243ss':
         descr = ''' 
-                This example shows that the horn cyclide in S^4 admits a 
+                This example shows that the horn cyclide in S^3 admits a 
                 2-dimensional family of Moebius automorphisms.
                 '''
-        infoG = 'SO(2) x SE(1): [ s + e, e + s ]'
+        infoG = 'SO(2) x SX(1): [ s + e, e + s ]'
         exc_idx_lst = [5, 6, 7, 8]
         c_lst_lst = [ s + e, e + s ]
         involution = 'leftright'
 
     elif case == '243st':
         descr = ''' 
-                This example shows that the spindle cyclide in S^4 admits a 
+                This example shows that the spindle cyclide in S^3 admits a 
                 2-dimensional family of Moebius automorphisms.
                 '''
         infoG = 'SO(2) x SE(1): [ s + e, e + t ]'
@@ -237,6 +200,43 @@ def usecase__invariant_quadratic_forms( case ):
         if 1 in sig:
             mt.p( '\t', sig )
     mt.p( '\n' + 80 * '-' )
+
+
+def usecase__invariant_quadratic_forms_experiment():
+    '''
+    OUTPUT:
+      - Let G be a subgroup of Aut(P^1xP^1)
+        Compute the vectors space of real G-invariant quadratic forms in
+        the ideal of a (projection of) the double Segre surface
+        obtained by the method:
+            "DSegre.get_ideal_lst( exc_idx_lst )"
+    '''
+    #
+    # obtain 1-parameter subgroups whose tangent vectors at the
+    # identity generates the Lie algebra sl(2)
+    #
+    t, q, s, r, e, T = DSegre.get_gens_sl2()
+
+    #
+    # set input parameters
+    #
+    exc_idx_lst = []
+    c_lst_lst = [ s + e, e + t ]
+    involution = 'leftright'
+    mt.p( 'exc_idx_lst =', exc_idx_lst )
+    mt.p( 'c_lst_lst   =', DSegre.to_str( c_lst_lst ) )
+    mt.p( 'involution  =', involution )
+    mt.p( '---' )
+
+    #
+    # compute vector space of real invariant quadratic forms.
+    #
+    iq_lst = DSegre.get_invariant_qf( c_lst_lst, exc_idx_lst )
+    mt.p( 'invariant quadratic forms =\n\t', iq_lst )
+    iq_lst = DSegre.change_basis( iq_lst, involution )
+    mt.p( 'change basis              =\n\t', iq_lst )
+    iq_lst = MARing.replace_conj_pairs( iq_lst )
+    mt.p( 'replaced conjugate pairs  =\n\t', iq_lst )
 
 
 def usecase__toric_invariant_celestials():
@@ -503,48 +503,53 @@ def usecase__horn_and_spindle_cyclides():
         mt.p( 80 * '-' + 2 * '\n' )
 
 
-
-def usecase__complex_classification():
+def usecase__classification():
     '''
     OUTPUT:
         - Prints a classification of quadratic forms
-          that contain some fixed double Segre surface
+          that contain some fixed double Segre surface S
           in projective 8-space, such that the quadratic
           form is invariant under subgroup of Aut(S).
           We consider subgroups equivalent, if they are
-          complex conjugate in Aut(P^1xP^1).  
+          real conjugate in Aut(P^1xP^1).  
     '''
 
+    for involution in ['identity', 'leftright', 'rotate']:
 
-    c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
-    for key in c_lst_lst_dct:
+        for c_lst_lst in DSegre.get_c_lst_lst_lst():
 
-        mt.p( 10 * '=' )
-        mt.p( 'dimension =', key )
-        mt.p( 10 * '=' )
+                #
+                # compute invariant quadratic forms
+                #
+                iq_lst = DSegre.get_invariant_qf( c_lst_lst )
+                iq_lst = DSegre.change_basis( iq_lst, involution )
+                iq_lst = MARing.replace_conj_pairs( iq_lst )
 
-        for c_lst_lst in c_lst_lst_dct[key]:
+                #
+                # computes signatures of random quadrics in
+                # the vector space of invariant quadratic forms.
+                #
+                sig_lst = []
+                if 'I' not in str( iq_lst ):
+                    sig_lst = MARing.get_rand_sigs( iq_lst, 10 )
 
-            mt.p( '\t', 10 * '-' )
-            mt.p( '\t', 'group           =', DSegre.to_str( c_lst_lst ) )
-            mt.p( '\t', 10 * '-' )
 
-            for involution in ['identity', 'leftright', 'rotate']:
-
-                J = DSegre.get_invariant_qf( c_lst_lst )
-                J = DSegre.change_basis( J, involution )
-
-                mt.p( '\t', 'involution      =', involution )
-                mt.p( '\t', 'invariant ideal = <' )
-                for gen in J:
+                mt.p( '\t', 10 * '-' )
+                mt.p( '\t', 'involution        =', involution )
+                mt.p( '\t', 'group             =', DSegre.to_str( c_lst_lst ) )
+                mt.p( '\t', 'invariant ideal   = <' )
+                for iq in iq_lst:
                     sig = ''
-                    if 'I' not in str( gen ):
-                        sig = MARing.get_sig( gen )
-                    mt.p( '\t\t', gen, '\t\t', sig )
+                    if 'I' not in str( iq ):
+                        sig = MARing.get_sig( iq )
+                    mt.p( '\t\t', iq, '\t\t', sig )
                 mt.p( '\t\t', '>' )
-                mt.p( '\t', 5 * '.-' )
-
-            mt.p( '\t', 10 * '-' )
+                mt.p( '\t', 'random signatures =' )
+                mt.p( '\t\t', sig_lst )
+                for sig in sig_lst:
+                    if 1 in sig:
+                        mt.p( '\t\t', sig )
+                mt.p( '\t', 10 * '-' )
 
 
 def usecase__invariant_quadratic_forms_veronese( case ):
@@ -672,9 +677,12 @@ if __name__ == '__main__':
 
     # for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
     #    usecase__invariant_quadratic_forms( case )
-    usecase__toric_invariant_celestials()
-    # usecase__horn_and_spindle_cyclides()
-    # usecase__complex_classification() # takes some time
+
+    # usecase__invariant_quadratic_forms_experiment()
+
+    # usecase__toric_invariant_celestials()
+    usecase__horn_and_spindle_cyclides()
+    # usecase__classification()  # takes about 9 hours
 
     # for case in ['1a', '1b', 'sl3', 'so3']:
     #    usecase__invariant_quadratic_forms_veronese( case )
