@@ -455,9 +455,9 @@ def usecase__horn_and_spindle_cyclides():
         xv = x0, x3, x4, x6, x7 = ring( 'x0,x3,x4,x6,x7' )
         y0, y1, y2, y3 = ring( 'y0,y1,y2,y3' )
         m = matrix( MARing.R, [
-            [a, 0, 0, 0, 0],
+            [0, 0, a, 0, 0],
             [0, 1, 0, 0, 0],
-            [0, -1, -1, 0, 0],
+            [-1, -1, 0, 0, 0],
             [0, 0, 0, 1, 0],
             [0, 0, 0, 0, 1]] )
         v = vector( xv )
@@ -476,7 +476,7 @@ def usecase__horn_and_spindle_cyclides():
         G2 = sage_eval( str( G2 ), S.gens_dict() )
         assert G1 in S
         assert G2 in S
-        smap = [y0 - ( x4 + x3 ), y1 - x0, y2 - x7, y3 - x6]  # +x4^2-x0^2-x3^2-x6^2-x7^2
+        smap = [y0 - ( x0 + x3 ), y1 - x4, y2 - x7, y3 - x6]
         prj_lst = S.ideal( [G1, G2] + smap ).elimination_ideal( [x0, x3, x4, x6, x7] ).gens()
         eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
 
