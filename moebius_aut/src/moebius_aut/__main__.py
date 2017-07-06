@@ -681,11 +681,11 @@ if __name__ == '__main__':
     # usecase__invariant_quadratic_forms_experiment()
 
     # usecase__toric_invariant_celestials()
-    usecase__horn_and_spindle_cyclides()
+    # usecase__horn_and_spindle_cyclides()
     # usecase__classification()  # takes about 9 hours
 
-    # for case in ['1a', '1b', 'sl3', 'so3']:
-    #    usecase__invariant_quadratic_forms_veronese( case )
+    for case in ['1a', '1b', 'sl3', 'so3']:
+        usecase__invariant_quadratic_forms_veronese( case )
 
     ###############################################
 
