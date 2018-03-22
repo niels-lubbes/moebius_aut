@@ -3,20 +3,20 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Feb 20, 2017
 @author: Niels Lubbes
 '''
-from sage.all import *
 
-from class_ma_tools import MATools
-from class_ma_ring import ring
-from class_ma_ring import MARing
+from moebius_aut.class_ma_tools import MATools
+from moebius_aut.class_ma_ring import ring
+from moebius_aut.class_ma_ring import MARing
 
-
+from moebius_aut.sage_interface import sage_matrix
+from moebius_aut.sage_interface import sage_vector
+from moebius_aut.sage_interface import sage_invariant_theory
 
 class DSegre( object ):
     '''
-    This class represents the Segre embedding of P^2xP^2 
-    restricted to CxC where C is the Veronese embedding 
-    of P^1 into P^2. We refer to such a surface as the 
-    "double Segre surface" and it lives in projective 8-space P^8.
+    This class represents the Veronese-Segre embedding of P^1xP^1 
+    We refer to such a surface as the "double Segre surface" and 
+    it lives in projective 8-space P^8.
     The double Segre surface is the anticanonical model of a 
     Del Pezzo surface of degree 8.        
     '''
@@ -38,39 +38,34 @@ class DSegre( object ):
         (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
         =
         (1:x1:x2:x3:x4:x5:x6:x7:x8)
-        
-        We can put the exponents of the monomials in a lattice
-        where x0 corresponds to coordinate (0,0), x6 to (-1,-1)
-        x5 to (1,1) and x8 to (-1,1): 
                 
-              x8 x3 x5
-              x2 x0 x1
-              x6 x4 x7  
-        
-        For example, if we compose with the projection 
+        If we compose this parametrization with for example 
+        the projection 
             (1:x1:x2:x3:x4:x5:x6:x7:x8)
              |->
             (1:x1:x2:x3:x4:x7:x8)
         then we obtain a degree 6 Del Pezzo surface. 
-        The corresponding ideal is obtained by setting 
+        The ideal of this surface is obtained by setting 
         the input parameter "exc_idx_lst" to "[5,6]". 
 
-        INPUT:
-            - "exc_idx_lst" -- A list of integers in [0,8].
-            - "varname"     -- A character in [ "x", "y", "z" ].
-        OUTPUT:
-            - Returns a (sub-)list of generators for the ideal 
-              of the double Segre surface.
-              The ideal lives in a subring 
-                  QQ[x0,...,x8] 
-              of the ring represented by "MARing.R".
-              For each index i in "exc_idx_lst" the 
-              generators that contain xi are omitted.
-
-              The generators for the ideal are all quadratic forms
-              and also form a vector space over CC of all quadratic 
-              forms that contain (a projection of) the double 
-              Segre surface.                                
+        Parameters
+        ----------
+        exc_idx_lst: list<int> 
+            A list of integers in [0,8].
+        
+        varname: ch     
+            A character in [ 'x', 'y', 'z' ].
+        
+        Returns
+        -------
+        list
+            A (sub-)list of generators for the ideal of the 
+            double Segre surface. The ideal lives in a subring             
+                QQ[x0,...,x8] (or QQ[y0,...,y8] or QQ[z0,...,z8])
+            of the ring represented by "MARing.R". 
+            The variable names are determined by "varname". 
+            For each index i in "exc_idx_lst" the generators that contain 
+            xi (or yi or zi) are omitted.                                                     
         '''
 
         s_lst = []
@@ -114,70 +109,88 @@ class DSegre( object ):
     @staticmethod
     def change_basis( iqf_lst, involution = 'identity' ):
         '''
-        INPUT:
-            - "iqf_lst"     -- A list of elements in the subring NF[x0,...,x8] 
-                               of "MARing.R" where NF denotes the Guassian 
-                               rationals QQ(I) with I^2=-1.
-                               
-            - "involution"  -- Either one of the following strings:
-                               'identity', 'leftright', 'rotate', 'diagonal'.
-                                
-        OUTPUT:
-            - We consider a toric parametrization of double Segre surface
-              whose completion to P^1xP^1 is provided by "get_pmz_lst": 
+        The double Segre surface comes together with an antiholomorphic 
+        involution. This method allows us to change coordinates so that 
+        this antiholomorphic involution becomes complex conjugation.
+                        
+        A double Segre surface in projective 8-space P^8 is represented 
+        by a toric parametrization whose completion to P^1xP^1 is provided 
+        by "get_pmz_lst": 
             
-                (s,u) |-->
-                (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
-                =
-                (x0:x1:x2:x3:x4:x5:x6:x7:x8)
+            (s,u) |-->
+            (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
+            =
+            (x0:x1:x2:x3:x4:x5:x6:x7:x8)
             
-              We can put the exponents of the monomials in a lattice
-              where x0 corresponds to coordinate (0,0), x6 to (-1,-1)
-              x5 to (1,1) and x8 to (-1,1): 
+        We can put the exponents of the monomials in a lattice
+        where x0 corresponds to coordinate (0,0), x6 to (-1,-1)
+        x5 to (1,1) and x8 to (-1,1): 
                     
-                    x8 x3 x5
-                    x2 x0 x1
-                    x6 x4 x7
+            x8 x3 x5
+            x2 x0 x1
+            x6 x4 x7
                   
-              An antiholomorphic involution which preserves the toric structure
-              acts on the above lattice as a unimodular involution:
+        An antiholomorphic involution, that preserves the toric structure,
+        acts on the above lattice as a unimodular involution:
                   
-                    identity_*:    ( a, b ) |--> ( a, b)
-                    leftright_*:   ( a, b ) |--> (-a, b)
-                    rotate_*:      ( a, b ) |--> (-a,-b)  
-                    diagonal_*:    ( a, b ) |--> ( b, a)
+            identity_*:    ( a, b ) |--> ( a, b)
+            leftright_*:   ( a, b ) |--> (-a, b)
+            rotate_*:      ( a, b ) |--> (-a,-b)  
+            diagonal_*:    ( a, b ) |--> ( b, a)
         
-              These unimodular lattice involutions induce an involution on P^8: 
+        These unimodular lattice involutions induce an involution on P^8.
+        
+        We compose the toric parametrization of the double Segre surface 
+        with the one of the following maps in order to make the antiholomorphic
+        involution that acts on P^8, equal to complex conjugation.  
 
-                    identity: (x0:...:x8) |--> (x0:...:x8) 
+            identity: (x0:...:x8) |--> (x0:...:x8) 
 
-                    leftright:  x3 |--> x3,
-                                x0 |--> x0,  
-                                x4 |--> x4,                     
-                                x1 |--> x1 + I*x2, 
-                                x2 |--> x1 - I*x2, 
-                                x5 |--> x5 + I*x8, 
-                                x8 |--> x5 - I*x8,                                
-                                x7 |--> x7 + I*x6,
-                                x6 |--> x7 - I*x6 
+            leftright:  x3 |--> x3,
+                        x0 |--> x0,  
+                        x4 |--> x4,                     
+                        x1 |--> x1 + I*x2, 
+                        x2 |--> x1 - I*x2, 
+                        x5 |--> x5 + I*x8, 
+                        x8 |--> x5 - I*x8,                                
+                        x7 |--> x7 + I*x6,
+                        x6 |--> x7 - I*x6 
                                  
+            rotate: x0 |--> x0,
+                    x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
+                    x3 |--> x3 + I*x4, x4 |--> x3 - I*x4, 
+                    x5 |--> x5 + I*x6, x6 |--> x5 - I*x6, 
+                    x7 |--> x7 + I*x8, x8 |--> x7 - I*x8      
+                            
+            diagonal:   x5 |--> x5,
+                        x0 |--> x0, 
+                        x6 |--> x6, 
+                        x3 |--> x3 + I*x1,  
+                        x1 |--> x3 - I*x1,
+                        x8 |--> x8 + I*x7,  
+                        x7 |--> x8 - I*x7,
+                        x2 |--> x2 + I*x4,  
+                        x4 |--> x2 - I*x4            
 
-                    rotate: x0 |--> x0,
-                            x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
-                            x3 |--> x3 + I*x4, x4 |--> x3 - I*x4, 
-                            x5 |--> x5 + I*x6, x6 |--> x5 - I*x6, 
-                            x7 |--> x7 + I*x8, x8 |--> x7 - I*x8      
-                            
-                            
-                    diagonal:   x5 |--> x5,
-                                x0 |--> x0, 
-                                x6 |--> x6, 
-                                x3 |--> x3 + I*x1,  
-                                x1 |--> x3 - I*x1,
-                                x8 |--> x8 + I*x7,  
-                                x7 |--> x8 - I*x7,
-                                x2 |--> x2 + I*x4,  
-                                x4 |--> x2 - I*x4
+    
+        Parameters
+        ----------
+        iqf_lst: list<MARing>     
+            A list of elements in the subring NF[x0,...,x8] 
+            of "MARing.R" where NF denotes the Gaussian 
+            rationals QQ(I) with I^2=-1.
+                               
+        involution: str  
+            Either one of the following strings:
+            'identity', 'leftright', 'rotate', 'diagonal'.
+
+        Returns
+        -------
+            We consider the input "iqf_lst" as a map. 
+            We compose this map composed with the map corresponding to 
+            <identity>, <leftright>, <rotate> or <diagonal>.
+            We return a list of elements in NF[x0,...,x8] that
+            represents the composition. 
                                 
         '''
 
@@ -229,9 +242,11 @@ class DSegre( object ):
     @staticmethod
     def get_pmz_lst():
         '''
-        OUTPUT:
-            - Returns a list of polynomials of bidegree (2,2)
-              in the subring QQ[s,t;u,w] of the ring "MARing.R".
+        Returns
+        -------
+        list<MARing>
+            Returns a list of polynomials of bidegree (2,2)
+            in the subring QQ[s,t;u,w] of the ring "MARing.R".
         '''
 
         s_lst = []
@@ -253,30 +268,31 @@ class DSegre( object ):
     @staticmethod
     def get_aut_P8( c_lst ):
         '''
-        INPUT: 
-            - "c_lst" -- A list of length 8 with 
-                         elements c0,...,c7 in "MARing.FF". We 
-                         assume that the pair of matrices 
-                            ( [ c0 c1 ]   [ c4 c5 ] ) = (A,B) 
-                            ( [ c2 c3 ] , [ c6 c7 ] )                                                                                                                                                         
-                         represent an automorphism of P^1xP^1.
+        The double Segre surface S is isomorphic to P^1xP^1.
+        The pair (A,B) of 2x2 matrices denotes an automorphism 
+        of P^1xP^1. We compute the representation of this 
+        automorphism in P^8 by using the parametrization as 
+        provided by ".get_pmz_lst". Since we consider the 
+        2x2 matrices up to multiplication by a constant, 
+        it follows that the automorphism group is 6-dimensional.        
+        Formally, this method computes Sym^2(A)@Sym^2(B) 
+        where @ denotes the tensor product (otimes in tex).        
+        
+        Parameters
+        ---------- 
+        c_lst: list<MARing.FF>
+            A list of length 8 with elements c0,...,c7 in "MARing.FF". 
+            We assume that the pair of matrices 
+                ( [ c0 c1 ]   [ c4 c5 ] ) = (A,B) 
+                ( [ c2 c3 ] , [ c6 c7 ] )                                                                                                                                                         
+            represent an automorphism of P^1xP^1.
                                                              
-        OUTPUT:
-            - This method returns a 9x9 matrix defined over "MARing.FF",
-              which represents a (parametrized) automorphism of P^8
-              that preserves the double Segre surface S. 
-                                                  
-        METHOD:
-            - The double Segre surface S is isomorphic to P^1xP^1.
-              The pair (A,B) of 2x2 matrices denotes an automorphism 
-              of P^1xP^1. We compute the representation of this 
-              automorphism in P^8 by using the parametrization as 
-              provided by ".get_pmz_lst". Since we consider the 
-              2x2 matrices up to multiplication by a constant, 
-              it follows that the automorphism group is 6-dimensional.        
-              Formally, this method computes Sym^2(A)@Sym^2(B) 
-              where @ denotes the tensor product (otimes in tex).
-            
+        Returns
+        -------
+        sage_matrix
+            A 9x9 matrix defined over "MARing.FF", which represents a 
+            (parametrized) automorphism of P^8 that preserves the 
+            double Segre surface S.                                                 
         '''
         # obtain parametrization in order to compute Sym^2(?)@Sym^2(?)
         #
@@ -304,7 +320,7 @@ class DSegre( object ):
             for pmz in pmz_lst:
                 row += [spmz.coefficient( pmz )]
             mat += [row]
-        mat = matrix( MARing.FF, mat )
+        mat = sage_matrix( MARing.FF, mat )
 
         MATools.p( 'c_lst =', c_lst )
         MATools.p( 'mat =\n' + str( mat ) )
@@ -335,8 +351,8 @@ class DSegre( object ):
         for i in range( len( g_lst ) ):
             qpol += q[i] * g_lst[i]
 
-        qmat = invariant_theory.quadratic_form( qpol, x ).as_QuadraticForm().matrix()
-        qmat = Matrix( MARing.R, qmat )
+        qmat = sage_invariant_theory.quadratic_form( qpol, x ).as_QuadraticForm().matrix()
+        qmat = sage_matrix( MARing.R, qmat )
 
         return qmat
 
@@ -472,7 +488,7 @@ class DSegre( object ):
         # associated to the symmetric matrix qmat.
         #
         qmat = DSegre.get_qmat( exc_idx_lst )
-        qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
+        qpol = list( sage_vector( x ).row() * qmat * sage_vector( x ).column() )[0][0]
         sqpol = qpol.subs( sol_dct )
         mt.p( 'sqpol   =', sqpol )
         mt.p( 'r       =', r )
@@ -485,6 +501,7 @@ class DSegre( object ):
         mt.p( 'iqf_lst =', iqf_lst )
 
         return iqf_lst
+
 
     @staticmethod
     def get_gens_sl2():
@@ -602,8 +619,8 @@ class DSegre( object ):
                             
               The output is a list of "c_lst_lst" elements. 
               Each "c_lst_lst" represent Lie subalgebra's of sl2+sl2 up to conjugacy.
-              Exactly one representative for each conjugacy class is contained in 
-              the output list.                                                                         
+              Up to flipping the left- and right-factor, exactly one representative 
+              for each conjugacy class is contained in the output list.                                                                         
         '''
         #
         # obtain 1-parameter subgroups whose tangent vectors at the
@@ -611,67 +628,76 @@ class DSegre( object ):
         #
         t, q, s, r, e, T = DSegre.get_gens_sl2()
 
+        # shorthand notation
+        #
+        t1 = t + e; t2 = e + t
+        q1 = q + e; q2 = e + q
+        s1 = s + e; s2 = e + s
+        r1 = r + e; r2 = e + r
+
         # construct dictionary for string representation
         #
-        DSegre.__str_dct[str( t + e )] = 't1'
-        DSegre.__str_dct[str( q + e )] = 'q1'
-        DSegre.__str_dct[str( s + e )] = 's1'
-        DSegre.__str_dct[str( r + e )] = 'r1'
-        DSegre.__str_dct[str( e + t )] = 't2'
-        DSegre.__str_dct[str( e + q )] = 'q2'
-        DSegre.__str_dct[str( e + s )] = 's2'
-        DSegre.__str_dct[str( e + r )] = 'r2'
+        DSegre.__str_dct[str( t1 )] = 't1'
+        DSegre.__str_dct[str( q1 )] = 'q1'
+        DSegre.__str_dct[str( s1 )] = 's1'
+        DSegre.__str_dct[str( r1 )] = 'r1'
+        DSegre.__str_dct[str( t2 )] = 't2'
+        DSegre.__str_dct[str( q2 )] = 'q2'
+        DSegre.__str_dct[str( s2 )] = 's2'
+        DSegre.__str_dct[str( r2 )] = 'r2'
 
-        DSegre.__str_dct[str( t + t )] = 't1xt2'
-        DSegre.__str_dct[str( q + q )] = 'g1xq2'
-        DSegre.__str_dct[str( s + s )] = 's1xs2'
-        DSegre.__str_dct[str( r + r )] = 'r1xr2'
-        DSegre.__str_dct[str( r + s )] = 'r1xs2'
-        DSegre.__str_dct[str( s + r )] = 's1xr2'
-        DSegre.__str_dct[str( r + t )] = 'r1xt2'
-        DSegre.__str_dct[str( t + r )] = 't1xr2'
-        DSegre.__str_dct[str( s + t )] = 's1xt2'
-        DSegre.__str_dct[str( t + s )] = 't1xs2'
+        DSegre.__str_dct[str( t + t )] = 't1+t2'
+        DSegre.__str_dct[str( q + q )] = 'g1+q2'
+        DSegre.__str_dct[str( s + s )] = 's1+s2'
+        DSegre.__str_dct[str( r + r )] = 'r1+r2'
+        DSegre.__str_dct[str( r + s )] = 'r1+s2'
+        DSegre.__str_dct[str( s + r )] = 's1+r2'
+        DSegre.__str_dct[str( r + t )] = 'r1+t2'
+        DSegre.__str_dct[str( t + r )] = 't1+r2'
+        DSegre.__str_dct[str( s + t )] = 's1+t2'
+        DSegre.__str_dct[str( t + s )] = 't1+s2'
 
         # construct classification of real Lie subalgebras
         #
         c_lst_lst_lst = []
 
-        # first projection is <t,q,s>
-        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t, e + q, e + s ]]
-        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t, e + s ]]
-        c_lst_lst_lst += [[ t + e, q + e, s + e, e + r ]]
-        c_lst_lst_lst += [[ t + e, q + e, s + e, e + s ]]
-        c_lst_lst_lst += [[ t + e, q + e, s + e, e + t ]]
+        # Second projection Lie algebra is trivial
+        c_lst_lst_lst += [[ t1, q1, s1 ]]
+        c_lst_lst_lst += [[ t1, s1 ]]
+        c_lst_lst_lst += [[ t1 ]]
+        c_lst_lst_lst += [[ s1 ]]
+        c_lst_lst_lst += [[ r1 ]]
+
+        # Lie algebra is a product
+        c_lst_lst_lst += [[ t1, q1, s1, t2, q2, s2 ]]
+        c_lst_lst_lst += [[ t1, q1, s1, t2, s2 ]]
+        c_lst_lst_lst += [[ t1, q1, s1, t2 ]]
+        c_lst_lst_lst += [[ t1, q1, s1, s2 ]]
+        c_lst_lst_lst += [[ t1, q1, s1, r2 ]]
+        c_lst_lst_lst += [[ t1, s1, t2, s2 ]]
+        c_lst_lst_lst += [[ t1, s1, t2 ]]
+        c_lst_lst_lst += [[ t1, s1, s2 ]]
+        c_lst_lst_lst += [[ t1, s1, r2 ]]
+        c_lst_lst_lst += [[ t1, t2 ]]
+        c_lst_lst_lst += [[ t1, s2 ]]
+        c_lst_lst_lst += [[ t1, r2 ]]
+        c_lst_lst_lst += [[ s1, s2 ]]
+        c_lst_lst_lst += [[ s1, r2 ]]
+        c_lst_lst_lst += [[ r1, r2 ]]
+
         c_lst_lst_lst += [[ t + t, q + q, s + s ]]
-        c_lst_lst_lst += [[ t + e, q + e, s + e ]]
-
-        # first projection is <t,s>
-        c_lst_lst_lst += [[ t + e, s + e, e + t, e + s ]]
-        c_lst_lst_lst += [[ t + e, s + e, e + r ]]
-        c_lst_lst_lst += [[ t + e, s + e, e + s ]]
-        c_lst_lst_lst += [[ t + e, s + e, e + t ]]
         c_lst_lst_lst += [[ t + t, s + s ]]
-        c_lst_lst_lst += [[ t + e, s + e ]]
-
-        # first projection is <r>
-        c_lst_lst_lst += [[ r + e, e + r ]]
-        c_lst_lst_lst += [[ r + e, e + s ]]
-        c_lst_lst_lst += [[ r + e, e + t ]]
-        c_lst_lst_lst += [[ r + r ]]
-        c_lst_lst_lst += [[ r + s ]]
-        c_lst_lst_lst += [[ r + t ]]
-        c_lst_lst_lst += [[ r + e ]]
-
-        # first projection is <s>
-        c_lst_lst_lst += [[ s + e, e + s ]]
+        c_lst_lst_lst += [[ t + t ]]
         c_lst_lst_lst += [[ s + s ]]
-        c_lst_lst_lst += [[ s + t ]]
-        c_lst_lst_lst += [[ s + e ]]
+        c_lst_lst_lst += [[ r + r ]]
+        c_lst_lst_lst += [[ t + s ]]
+        c_lst_lst_lst += [[ t + r ]]
+        c_lst_lst_lst += [[ s + r ]]
 
-        # first projection is <t>
-        c_lst_lst_lst += [[ t + e, e + t ]]
-        c_lst_lst_lst += [[ t + e ]]
+        c_lst_lst_lst += [[ s + s, t1, t2 ]]
+        c_lst_lst_lst += [[ s + t, t1 ]]
+        c_lst_lst_lst += [[ s + s, t1 ]]
+        c_lst_lst_lst += [[ s + r, t1 ]]
 
         return c_lst_lst_lst
 

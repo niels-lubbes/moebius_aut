@@ -3,7 +3,16 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Feb 20, 2017
 @author: Niels Lubbes
 '''
-from sage.all import *
+
+from moebius_aut.sage_interface import sage_diagonal_matrix
+from moebius_aut.sage_interface import sage_matrix
+from moebius_aut.sage_interface import sage_vector
+from moebius_aut.sage_interface import sage_var
+from moebius_aut.sage_interface import sage_sin
+from moebius_aut.sage_interface import sage_cos
+from moebius_aut.sage_interface import sage_ZZ
+from moebius_aut.sage_interface import sage__eval
+from moebius_aut.sage_interface import sage_diff
 
 from moebius_aut.class_dsegre import DSegre
 from moebius_aut.class_ma_ring import ring
@@ -143,7 +152,7 @@ class TestClassDSegre:
         print( list( out ) )
         print( out )
         t = ( k + 1 ) ** 2
-        assert out == diagonal_matrix( [1, t, 1 / t, 1, 1, t, 1 / t, t, 1 / t ] )
+        assert out == sage_diagonal_matrix( [1, t, 1 / t, 1, 1, t, 1 / t, t, 1 / t ] )
 
 
     def test__qmat( self ):
@@ -183,7 +192,7 @@ class TestClassDSegre:
             chk_qpol += q[i] * g_lst[i]
 
         qmat = DSegre.get_qmat()
-        qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
+        qpol = list( sage_vector( x ).row() * qmat * sage_vector( x ).column() )[0][0]
         assert qpol == chk_qpol
 
 
@@ -221,36 +230,46 @@ class TestClassDSegre:
         assert iqf_lst == ring( '[x0^2 - x1*x2, x0^2 - x3*x4]' )
 
 
-    def test__get_c_lst_lst_dct( self ):
+    def test__get_c_lst_lst_lst( self ):
         k = ring( 'k' )
-        c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
-        for key in c_lst_lst_dct:
-            for c_lst_lst in c_lst_lst_dct[key]:
-                assert len( c_lst_lst ) == key
-                for c_lst in c_lst_lst:
-                    assert len( c_lst ) == 8
-                    # evaluate at k=0
-                    n_lst = []
-                    for c in c_lst:
-                        if c in ZZ:
-                            n_lst += [ c ]
-                        else:
-                            n_lst += [c.subs( {k:0} ) ]
-                    print( n_lst )
-                    assert n_lst == [1, 0, 0, 1, 1, 0, 0, 1]
-                    for c in c_lst:
-                        assert c in MARing.FF
+        for c_lst_lst in DSegre.get_c_lst_lst_lst():
+            for c_lst in c_lst_lst:
+                # evaluate at k=0
+                n_lst = []
+                for c in c_lst:
+                    if c in sage_ZZ:
+                        n_lst += [ c ]
+                    else:
+                        n_lst += [c.subs( {k:0} ) ]
+                print( n_lst )
+                assert n_lst == [1, 0, 0, 1, 1, 0, 0, 1]
+                for c in c_lst:
+                    assert c in MARing.FF
 
 
     def test__to_str( self ):
 
-        c_lst_lst_dct = DSegre.get_c_lst_lst_dct()
         s = '[ '
-        for c_lst_lst in c_lst_lst_dct[2]:
+        for c_lst_lst in DSegre.get_c_lst_lst_lst():
              s += DSegre.to_str( c_lst_lst ) + ', '
         s = s[:-2] + ' ]'
         print( s )
-        assert s == '[ < t1, s1 >, < t1, t2 >, < t1, s2 >, < s1, s2 >, < t1xs2, t2 >, < s1xs2, t2 >, < t1xt2, s1xs2 > ]'
+
+        chk = '[ '
+        chk += '< t1, q1, s1 >, < t1, s1 >, < t1 >, < s1 >, < r1 >, '
+        chk += '< t1, q1, s1, t2, q2, s2 >, < t1, q1, s1, t2, s2 >, '
+        chk += '< t1, q1, s1, t2 >, < t1, q1, s1, s2 >, < t1, q1, s1, r2 >, '
+
+        chk += '< t1, s1, t2, s2 >, < t1, s1, t2 >, < t1, s1, s2 >, < t1, s1, r2 >, '
+        chk += '< t1, t2 >, < t1, s2 >, < t1, r2 >, < s1, s2 >, < s1, r2 >, < r1, r2 >, '
+
+        chk += '< t1+t2, g1+q2, s1+s2 >, < t1+t2, s1+s2 >, < t1+t2 >, < s1+s2 >, < r1+r2 >, '
+        chk += '< t1+s2 >, < t1+r2 >, < s1+r2 >, '
+
+        chk += '< s1+s2, t1, t2 >, < s1+t2, t1 >, < s1+s2, t1 >, < s1+r2, t1 > '
+        chk += ']'
+
+        assert s == chk
 
 
     def test__get_aut_P8__action_of_involution( self ):
@@ -266,7 +285,7 @@ class TestClassDSegre:
         # left-right involution
         #
         M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
-        L = matrix( [
+        L = sage_matrix( [
             ( 1, 0, 0, 0, 0, 0, 0, 0, 0 ),
             ( 0, 0, 1, 0, 0, 0, 0, 0, 0 ),
             ( 0, 1, 0, 0, 0, 0, 0, 0, 0 ),
@@ -286,7 +305,7 @@ class TestClassDSegre:
         # rotate
         #
         M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
-        R = matrix( [
+        R = sage_matrix( [
             ( 1, 0, 0, 0, 0, 0, 0, 0, 0 ),
             ( 0, 0, 1, 0, 0, 0, 0, 0, 0 ),
             ( 0, 1, 0, 0, 0, 0, 0, 0, 0 ),
@@ -324,7 +343,6 @@ class TestClassDSegre:
         q = MARing.q()
         r = MARing.r()
 
-
         #
         # We consider the representation of the
         # following matrix into P^8
@@ -351,20 +369,20 @@ class TestClassDSegre:
         #
         M = DSegre.get_aut_P8( [a, b, c, d] + [e, f, g, h] )
 
-        a, b, c, d, e, f, g, h = var( 'a, b, c, d, e, f, g, h' )
-        k = var( 'k' )
-        M = sage_eval( str( list( M ) ), {'a':a, 'b':b, 'c':c, 'd':d, 'e':e, 'f':f, 'g':g, 'h':h, 'k':k} )
-        M = matrix( M )
-        M = M.subs( {a:cos( k ), b:-sin( k ), c:sin( k ), d:cos( k ), e:1, f:0, g:0, h:1} )
+        a, b, c, d, e, f, g, h = sage_var( 'a, b, c, d, e, f, g, h' )
+        k = sage_var( 'k' )
+        M = sage__eval( str( list( M ) ), {'a':a, 'b':b, 'c':c, 'd':d, 'e':e, 'f':f, 'g':g, 'h':h, 'k':k} )
+        M = sage_matrix( M )
+        M = M.subs( {a:sage_cos( k ), b:-sage_sin( k ), c:sage_sin( k ), d:sage_cos( k ), e:1, f:0, g:0, h:1} )
 
         # differentiate the entries of M wrt. k
         dmat = []
         for row in M:
             drow = []
             for col in row:
-                drow += [ diff( col, k ) ]
+                drow += [ sage_diff( col, k ) ]
             dmat += [drow]
-        M = matrix( dmat )
+        M = sage_matrix( dmat )
         B = M.subs( {k:0} )
 
         assert str( A ) == str( B )
@@ -372,6 +390,7 @@ class TestClassDSegre:
 
 
 if __name__ == '__main__':
-    TestClassDSegre().test__get_aut_P8__action_of_involution()
-    #    TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
-
+    # TestClassDSegre().test__get_aut_P8__action_of_involution()
+    # TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
+    # TestClassDSegre().test__get_c_lst_lst_lst()
+    TestClassDSegre().test__to_str()
