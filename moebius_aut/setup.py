@@ -17,13 +17,13 @@ def readme():
 
 
 setup( name = 'moebius_aut',
-       version = '1.0',
+       version = '0',
        description = 'Moebius automorphisms of surfaces',
        long_description = readme(),
        classifiers = [
            'Development Status :: 3 - Alpha',
            'License :: OSI Approved :: MIT License',
-           'Programming Language :: Python :: 2.7',
+           'Programming Language :: Python :: 3.6',
            'Topic :: Scientific/Engineering :: Mathematics',
            ],
       keywords = 'surfaces automorphisms circles',
