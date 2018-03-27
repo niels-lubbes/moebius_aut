@@ -331,17 +331,28 @@ class DSegre( object ):
     @staticmethod
     def get_qmat( exc_idx_lst = [] ):
         '''
-        INPUT:
-            - "exc_idx_lst" -- A list of integers in [0,8].      
+        We obtain generators of the ideal 
+        of the (projection of) the double Segre surface
+        with the method "get_ideal_lst( exc_idx_lst )".
+        If the ideal is of a projection of the double Segre
+        surface, then the returned matrix with parameters
+        q0,...,q19 is not of full rank.
+        
+        Parameters
+        ----------
+        exc_idx_lst : list<int>
+            A list of integers in [0,8].      
               
-        OUTPUT:
-            - Returns a symmetric 9x9 matrix with entries
-              in the ring QQ[q0,...,q19] which is a subring 
-              of "MARing.R". It represents the Gramm matrix 
-              of a quadratic form in the ideal of the              
-              double Segre surface or a projection of 
-              the double Segre surface with ideal defined
-              by "get_ideal_lst( exc_idx_lst )".                        
+        Returns
+        -------
+        sage_matrix<MARing.R>
+            A symmetric 9x9 matrix with entries
+            in the ring QQ[q0,...,q19] which is a subring 
+            of "MARing.R". It represents the Gramm matrix 
+            of a quadratic form in the ideal of the              
+            double Segre surface or a projection of 
+            the double Segre surface with ideal defined
+            by "get_ideal_lst( exc_idx_lst )".                        
         '''
         x = MARing.x()
         q = MARing.q()
@@ -360,52 +371,54 @@ class DSegre( object ):
     @staticmethod
     def get_invariant_q_lst( c_lst, exc_idx_lst = [] ):
         '''                        
-        INPUT: 
-          - "c_lst" --  A list of length 8 with elements 
-                        c0,...,c7 in QQ(k), 
-                        where QQ(k) is a subfield of "MARing.FF".
-                        If we substitute k:=0 in the entries of 
-                        "c_lst" then we should obtain the list:
-                            [1,0,0,1,1,0,0,1].                                                                                  
-                        A c_lst represents a pair of two matrices:                                
-                            ( [ c0 c1 ]   [ c4 c5 ] ) 
-                            ( [ c2 c3 ] , [ c6 c7 ] )                                   
-                        with the property that 
-                            c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0. 
-                        If the two matrices are not normalized
-                        to have determinant 1 then the method should be 
-                        taken with care (it should be checked that the
-                        tangent vectors at the identity generate the 
-                        correct Lie algebra).                                                    
+        Parameters
+        ----------
+        c_lst : list<MARing.FF>
+            A list of length 8 with elements 
+                c0,...,c7 in QQ(k), 
+            where QQ(k) is a subfield of "MARing.FF".
+            If we substitute k:=0 in the entries of 
+            "c_lst" then we should obtain the list:
+                [1,0,0,1,1,0,0,1].                                                                                  
+            A c_lst represents a pair of two matrices:                                
+                ( [ c0 c1 ]   [ c4 c5 ] ) 
+                ( [ c2 c3 ] , [ c6 c7 ] )                                   
+            with the property that 
+                c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0. 
+            If the two matrices are not normalized
+            to have determinant 1, then the method should be 
+            taken with care (it should be checked that the
+            tangent vectors at the identity generate the 
+            correct Lie algebra).                                                    
                             
-          - "exc_idx_lst" -- A list of integers in [0,8].                              
+        exc_idx_lst : list<int> 
+            A list of integers in [0,8].                              
                                      
-        OUTPUT:
-            -  Let H be the representation of the pair
-               of matrices  
+        Returns
+        -------
+        list<MARing.R>
+            Let H be the representation of the pair of matrices  
                
-                    ( [ c0 c1 ]   [ c4 c5 ] ) 
-                    ( [ c2 c3 ] , [ c6 c7 ] )
+                ( [ c0 c1 ]   [ c4 c5 ] ) 
+                ( [ c2 c3 ] , [ c6 c7 ] )
                
-               into P^8 (see also ".get_aut_P8()").
-               We assume here that H is an element
-               in Aut(P^1xP^1) and normalized so that
-               each 2x2 matrix has determinant 1.
+            into P^8 (see also ".get_aut_P8()"). We assume here 
+            that H is an element in Aut(P^1xP^1) and normalized 
+            so that each 2x2 matrix has determinant 1.
                 
-               Thus H corresponds to a 1-parameter subgroup
-               of Aut(P^8), such that each automorphism preserves 
-               the double Segre surface S in projective 8-space P^8.
+            Thus H corresponds to a 1-parameter subgroup of Aut(P^8), 
+            such that each automorphism preserves the double Segre 
+            surface S in projective 8-space P^8.
                
-               This method returns a list of generators 
-               of an ideal J in the subring QQ[q0,...,q19] 
-               of "MARing.R". 
+            This method returns a list of generators of an ideal J 
+            in the subring QQ[q0,...,q19] of "MARing.R". 
                
-               Each point p in the zeroset V(J),
-               when substituted in the matrix 
-                   ".get_qmat(exc_idx_lst)",
-               defines a quadratic form in the ideal 
-                   ".get_ideal_lst(exc_idx_lst)"
-               that is preserved by the 1-parameter subgroup H.                                        
+            Each point p in the zeroset V(J), when substituted in 
+            the matrix 
+                ".get_qmat(exc_idx_lst)",
+            defines a quadratic form in the ideal 
+                ".get_ideal_lst(exc_idx_lst)"
+            that is preserved by the 1-parameter subgroup H.                                        
         '''
         # get representation of 1-parameter subgroup in Aut(P^8)
         #
@@ -432,33 +445,39 @@ class DSegre( object ):
     @staticmethod
     def get_invariant_qf( c_lst_lst, exc_idx_lst = [] ):
         '''
-        INPUT:        
-          - "c_lst_lst" --  A list of "c_lst"-lists.
-                            A c_lst is a list of length 8 with elements 
-                            c0,...,c7 in QQ(k), 
-                            where QQ(k) is a subfield of "MARing.FF".
-                            If we substitute k:=0 in the entries of 
-                            "c_lst" then we should obtain the list:
-                                [1,0,0,1,1,0,0,1].                                                                      
-                            A c_lst represents a pair of two matrices:                                
-                                ( [ c0 c1 ]   [ c4 c5 ] ) 
-                                ( [ c2 c3 ] , [ c6 c7 ] )                                   
-                            with the property that 
-                                c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0.
-                            If the two matrices are not normalized
-                            to have determinant 1 then the method should be 
-                            taken with care (it should be checked that the
-                            tangent vectors at the identity generate the 
-                            correct Lie algebra).                                             
-          - "exc_idx_lst" -- A list of integers in [0,8].                                     
-        OUTPUT:
-         -- A list of quadratic forms in the ideal of (a projection of) 
-            the double Segre surface S:
-                ".get_ideal_lst( exc_idx_lst )"
-            such that the quadratic forms are invariant 
-            under the automorphisms of S as defined by "c_lst_lst"
-            and such that the quadratic forms generate the module of  
-            all invariant quadratic forms. Note that Aut(S)=Aut(P^1xP^1).   
+        Parameters
+        ----------        
+        c_lst_lst : list<list<MARing.FF>>  
+            A list of "c_lst"-lists.
+            A c_lst is a list of length 8 with elements 
+            c0,...,c7 in QQ(k), 
+            where QQ(k) is a subfield of "MARing.FF".
+            If we substitute k:=0 in the entries of 
+            "c_lst" then we should obtain the list:
+                [1,0,0,1,1,0,0,1].                                                                      
+            A c_lst represents a pair of two matrices:                                
+                ( [ c0 c1 ]   [ c4 c5 ] ) 
+                ( [ c2 c3 ] , [ c6 c7 ] )                                   
+            with the property that 
+                c0*c3-c1*c2!=0 and c4*c7-c5*c6!=0.
+            If the two matrices are not normalized
+            to have determinant 1 then the method should be 
+            taken with care (it should be checked that the
+            tangent vectors at the identity generate the 
+            correct Lie algebra).                                             
+        
+        exc_idx_lst : list<int>
+            A list of integers in [0,8].                                     
+        
+        Returns
+        -------
+        A list of quadratic forms in the ideal of (a projection of) 
+        the double Segre surface S:
+            ".get_ideal_lst( exc_idx_lst )"
+        such that the quadratic forms are invariant 
+        under the automorphisms of S as defined by "c_lst_lst"
+        and such that the quadratic forms generate the module of  
+        all invariant quadratic forms. Note that Aut(S)=Aut(P^1xP^1).   
         '''
 
         # for verbose output
@@ -506,14 +525,16 @@ class DSegre( object ):
     @staticmethod
     def get_gens_sl2():
         '''
-        OUTPUT:
-          - A list of lists L of length 4 with elements c0,...,c3 in QQ(k)
+        Returns
+        -------
+        list<MARing.FF>
+            A list of lists L of length 4 with elements c0,...,c3 in QQ(k)
             where the function field QQ(k) is a subfield of "MARing.FF".
             If we substitute k:=0 in the entries of L then we obtain 
             the list [1,0,0,1]. A list L represent a 2x2 matrix
                 [ c0 c1 ]
                 [ c2 c3 ]
-            with the property that c0*c3-c1*c2=0.
+            with the property that c0*c3-c1*c2!=0.
               
             The antiholomorphic involution coming from the real
             structure induces---up to conjugacy---two possible 
@@ -553,7 +574,8 @@ class DSegre( object ):
             See the code for an overview of generators L.
             The tangent vectors of t, q and s generate the Lie algebra sl(2).  
                                         
-        EXAMPLE:
+        Examples
+        --------
             t, q, s, r, e, T = DSegre.get_gens_sl2()
             c_lst_lst = [s+e, e+s]
             iq_lst = DSegre.get_invariant_qf( c_lst_lst, [] )
@@ -580,47 +602,47 @@ class DSegre( object ):
     @staticmethod
     def get_c_lst_lst_lst():
         '''
-        OUTPUT:
-              
-            - A c_lst is a list of length 8 with elements c0,...,c7 in QQ(k), 
-              where QQ(k) is a subfield of "MARing.FF".
-              If we substitute k:=0 in the entries of "c_lst" then we obtain 
-              the list:
+        Returns
+        -------
+            A c_lst is a list of length 8 with elements c0,...,c7 in QQ(k), 
+            where QQ(k) is a subfield of "MARing.FF".
+            If we substitute k:=0 in the entries of "c_lst" then we obtain 
+            the list:
+             
+                [1,0,0,1,1,0,0,1].                                          
+            
+            A c_lst represents a pair of two matrices:
+            
+               ( [ c0 c1 ]   [ c4 c5 ] ) 
+               ( [ c2 c3 ] , [ c6 c7 ] )
                
-                  [1,0,0,1,1,0,0,1].                                          
-              
-              A c_lst represents a pair of two matrices:
-              
-                 ( [ c0 c1 ]   [ c4 c5 ] ) 
-                 ( [ c2 c3 ] , [ c6 c7 ] )
-                 
-              with the property that c0*c3-c1*c2=c4*c7-c5*c6=1.
-              
-              This pair represent a 1-parameter subgroup G 
-              (with parameter k) in Aut(P^1xP^1).
-              Both matrices are the identity automorphism when k=0. 
-              
-              For example SO(2)xSO(2) in Aut(P^1xP^1) has two generators:
-              
-                c_lst_0 = [1, -k, k, 1, 1, 0, 0, 1]
-                c_lst_1 = [1, 0, 0, 1, 1, -k, k, 1]
+            with the property that c0*c3-c1*c2=c4*c7-c5*c6=1.
+            
+            This pair represent a 1-parameter subgroup G 
+            (with parameter k) in Aut(P^1xP^1).
+            Both matrices are the identity automorphism when k=0. 
+            
+            For example SO(2)xSO(2) in Aut(P^1xP^1) has two generators:
+            
+              c_lst_0 = [1, -k, k, 1, 1, 0, 0, 1]
+              c_lst_1 = [1, 0, 0, 1, 1, -k, k, 1]
 
-              We now define c_lst_lst = [c_lst_0, c_lst_1].
-              
-              The tangent vector of these two 1-parameter subgroups at the 
-              identity determines an element in the Lie algebra sl2+sl2 
-              of Aut(P^1xP^1):
-               
-                      [0, -1, 1, 0, 1, 0, 0, 1]
-                      [1, 0, 0, 1, 0, -1, 1, 0]
-              
-              We assume that the antiholomorphic involution of the 
-              real structure acts as complex conjugation on the matrices.
-                            
-              The output is a list of "c_lst_lst" elements. 
-              Each "c_lst_lst" represent Lie subalgebra's of sl2+sl2 up to conjugacy.
-              Up to flipping the left- and right-factor, exactly one representative 
-              for each conjugacy class is contained in the output list.                                                                         
+            We now define c_lst_lst = [c_lst_0, c_lst_1].
+            
+            The tangent vector of these two 1-parameter subgroups at the 
+            identity determines an element in the Lie algebra sl2+sl2 
+            of Aut(P^1xP^1):
+             
+                    [0, -1, 1, 0, 1, 0, 0, 1]
+                    [1, 0, 0, 1, 0, -1, 1, 0]
+            
+            We assume that the antiholomorphic involution of the 
+            real structure acts as complex conjugation on the matrices.
+                          
+            The output is a list of "c_lst_lst" elements. 
+            Each "c_lst_lst" represent Lie subalgebra's of sl2+sl2 up to conjugacy.
+            Up to flipping the left- and right-factor, exactly one representative 
+            for each conjugacy class is contained in the output list.                                                                         
         '''
         #
         # obtain 1-parameter subgroups whose tangent vectors at the
@@ -705,10 +727,15 @@ class DSegre( object ):
     @staticmethod
     def to_str( c_lst_lst ):
         '''
-        INPUT: 
-            - "c_lst_lst" -- See output "get_c_lst_lst_dct".
-        OUTPUT:
-            - A string representation for "c_lst_lst".
+        Parameters
+        ---------- 
+            c_lst_lst : list 
+                See output "get_c_lst_lst_lst()".
+        
+        Returns
+        -------
+        str
+            A string representation for "c_lst_lst".
         '''
         if DSegre.__str_dct == {}:
             DSegre.get_c_lst_lst_lst()

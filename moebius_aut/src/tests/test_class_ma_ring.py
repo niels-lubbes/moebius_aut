@@ -3,9 +3,11 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Feb 20, 2017
 @author: Niels Lubbes
 '''
-from sage.all import *
+
 from moebius_aut.class_ma_ring import ring
 from moebius_aut.class_ma_ring import MARing
+
+from moebius_aut.sage_interface import sage_matrix
 
 
 class TestMARing:
@@ -49,7 +51,7 @@ class TestMARing:
         dmat = MARing.diff_mat( mat, a )
         print( mat )
         print( dmat )
-        assert dmat == matrix( MARing.FF, [( 1, 0 ), ( 0, -1 / a ** 2 )] )
+        assert dmat == sage_matrix( MARing.FF, [( 1, 0 ), ( 0, -1 / a ** 2 )] )
 
 
     def test__solve( self ):
