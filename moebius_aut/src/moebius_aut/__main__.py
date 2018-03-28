@@ -26,19 +26,15 @@ mt = MATools()
 
 def usecase__invariant_quadratic_forms( case ):
     '''
-    Let G be a subgroup of Aut(P^1xP^1).
-    Compute the vectors space of real G-invariant quadratic forms in
+    Let G be a subgroup of Aut(P^1xP^1) determined by the case-parameter.
+    We output the vectors space of real G-invariant quadratic forms in
     the ideal of a (projection of) the double Segre surface
     obtained by the method:
         "DSegre.get_ideal_lst( exc_idx_lst )"                   
     The real structure is specified in terms of an involution. See 
         "DSegre.change_basis()" 
     for the specification of involutions.
-
-    Notes
-    -----
-    See the source code for a description of each of the cases of
-    projections of double Segre surfaces that we consider.                
+    We also output signatures of random G-invariant quadratic forms. 
 
     Parameters
     ----------
@@ -53,6 +49,11 @@ def usecase__invariant_quadratic_forms( case ):
         triple then we extend with a character in [a-z].
         These are currently implemented cases:
             ['087','287','365','265s','265t','443','243ss','243st']
+
+    Notes
+    -----
+    See the source code below for a description of each of the cases of
+    projections of double Segre surfaces that we consider.                
                     
     '''
 
@@ -216,11 +217,15 @@ def usecase__invariant_quadratic_forms( case ):
 
 def usecase__invariant_quadratic_forms_experiment():
     '''
-    Let G be a subgroup of Aut(P^1xP^1).
-    We compute the vectors space of real G-invariant quadratic forms in
+    We output for given subgroup G of Aut(P^1xP^1),
+    the vectors space of real G-invariant quadratic forms in
     the ideal of a (projection of) the double Segre surface
     obtained by the method:
         "DSegre.get_ideal_lst( exc_idx_lst )"
+    
+    This method is for experimentation with different
+    groups and real structures. The parameters are set 
+    in the code. 
     '''
     #
     # obtain 1-parameter subgroups whose tangent vectors at the
@@ -251,7 +256,16 @@ def usecase__invariant_quadratic_forms_experiment():
 
 
 def usecase__toric_invariant_celestials():
-    '''    
+    '''  
+    We output the ideal and Hilbert polynomial of all possible 
+    toric projections of the double Segre  surface. For 
+    each generator in the ideal we consider its coordinate
+    change such that the real structure corresponding 
+    to leftright/rotate becomes complex conjugation
+    (see "DSegre.change_basis()").
+    
+    Notes
+    -----
     Suppose that G is the group of toric automorphisms
     of the double Serge surface X in P^8. The double 
     Segre surface admits a monomial parametrization. 
@@ -702,6 +716,7 @@ if __name__ == '__main__':
     mt.start_timer()
     mt.filter( '__main__.py' )  # output only from this module
     sage_set_verbose( -1 )  # surpresses warning message for slow for Groebner basis.
+
 
     ###############################################
     # (un)comment usecases for this package below #
