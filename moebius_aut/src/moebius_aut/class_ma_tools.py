@@ -3,8 +3,8 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Feb 7, 2017
 @author: Niels Lubbes
 '''
-from sage_interface import sage_load
-from sage_interface import sage_save
+from moebius_aut.sage_interface import sage_load
+from moebius_aut.sage_interface import sage_save
 
 import inspect
 import time
@@ -156,10 +156,8 @@ class MATools():
 
                 MATools.filter_unset()
                 MATools.p( 'Cannot load ".__tool_dct": ', e )
-                MATools.p( 'Exiting...' )
                 MATools.filter_reset()
-                sys.exit()
-                # MATools.__tool_dct = {}
+                MATools.__tool_dct = {}
 
         return MATools.__tool_dct
 

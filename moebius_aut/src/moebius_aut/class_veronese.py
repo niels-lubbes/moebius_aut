@@ -3,11 +3,14 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Apr 4, 2017
 @author: Niels Lubbes
 '''
-from sage.all import *
 
-from class_ma_tools import MATools
-from class_ma_ring import ring
-from class_ma_ring import MARing
+from moebius_aut.sage_interface import sage_matrix
+from moebius_aut.sage_interface import sage_vector
+from moebius_aut.sage_interface import sage_invariant_theory
+
+from moebius_aut.class_ma_tools import MATools
+from moebius_aut.class_ma_ring import ring
+from moebius_aut.class_ma_ring import MARing
 
 
 class Veronese( object ):
@@ -19,6 +22,93 @@ class Veronese( object ):
     @staticmethod
     def get_ideal_lst():
         '''
+        Returns
+        -------
+        list<MARing.R>
+            A list of generators for the ideal of the Veronese surface.
+            The ideal lives in a subring 
+                QQ[x0,...,x8] 
+            of the ring represented by "MARing.R".
+            The generators for the ideal are all quadratic forms
+            and also form a vector space over CC of all quadratic 
+            forms that contain the Veronese surface.  
+              
+        Notes
+        -----
+        We consider a toric parametrization of the Veronese surface:
+        
+        (s,t)
+        |-->
+        (1  : s*t : s  : t  : s^2 : t^2 )
+        =
+        (x0 : x1  : x2 : x3 : x4  : x5  )
+                            
+        We can put the exponents of the monomials in a lattice
+        where x0 corresponds to coordinate (0,0), x4 to (2,0)
+        and x5 to (0,2):  
+                
+              x5 x7 x8      
+              x3 x1 x6
+              x0 x2 x4  
+        
+        The monomial parametrization of the Veronese corresponds to the 
+        following lattice polygon:
+        
+              *
+              * *
+              * * *                           
+        '''
+
+        s_lst = []
+        s_lst += ['x1*x1 - x4*x5']
+        s_lst += ['x0*x1 - x2*x3']
+        s_lst += ['x2*x2 - x0*x4']
+        s_lst += ['x3*x3 - x0*x5']
+        s_lst += ['x1*x2 - x3*x4']
+        s_lst += ['x1*x3 - x2*x5']
+
+        return [ ring( s ) for s in s_lst ]
+
+
+    @staticmethod
+    def get_pmz_lst():
+        '''
+        Returns
+        -------
+        list<MARing.R>
+            A list of polynomials of degree 2 in the subring QQ[s,t,u] 
+            of the ring "MARing.R". These polynomials represent a 
+            parametrization of the Veronese surface.
+        '''
+        s_lst = [ 'u^2', 's*t', 's*u', 't*u', 's^2', 't^2']
+
+        return [ ring( s ) for s in s_lst ]
+
+
+    @staticmethod
+    def change_basis( iqf_lst ):
+        '''
+        Parameters
+        ----------
+        iqf_lst : list     
+            A list of elements in the subring NF[x0,...,x5] 
+            of "MARing.R" where NF denotes the Gaussian 
+            rationals QQ(I) with I^2=-1.
+                                                                       
+        Returns
+        -------
+        list 
+            The input "iqf_lst" where we make the following substitution            
+            for each polynomial  
+                x0 |--> x0,
+                x1 |--> x1, 
+                x2 |--> x2 + I*x3, 
+                x3 |--> x2 - I*x3,  
+                x4 |--> x4 + I*x5,
+                x5 |--> x4 - I*x5.               
+                                     
+        Notes
+        -----
         We consider a toric parametrization of the Veronese surface:
         
         (s,t)
@@ -41,89 +131,20 @@ class Veronese( object ):
               *
               * *
               * * * 
-            
-        OUTPUT:
+              
+        An antiholomorphic involution acts on the above lattice polygon 
+        as a unimodular involution:
+              
+                ( a, b ) |--> ( b, a)
         
-            - Returns a list of generators for the ideal 
-              of the Veronese surface.
-              The ideal lives in a subring 
-                  QQ[x0,...,x8] 
-              of the ring represented by "MARing.R".
-              The generators for the ideal are all quadratic forms
-              and also form a vector space over CC of all quadratic 
-              forms that contain the Veronese surface.              
-        '''
+        This unimodular lattice involutions induce an involution on P^5: 
 
-        s_lst = []
-        s_lst += ['x1*x1 - x4*x5']
-        s_lst += ['x0*x1 - x2*x3']
-        s_lst += ['x2*x2 - x0*x4']
-        s_lst += ['x3*x3 - x0*x5']
-        s_lst += ['x1*x2 - x3*x4']
-        s_lst += ['x1*x3 - x2*x5']
-
-        return [ ring( s ) for s in s_lst ]
-
-
-    @staticmethod
-    def get_pmz_lst():
-        '''
-        OUTPUT:
-            - Returns a list of polynomials of degree 2
-              in the subring QQ[s,t,u] of the ring "MARing.R".
-              These polynomials represent a parametrization of the 
-              Veronese surface.
-        '''
-        s_lst = [ 'u^2', 's*t', 's*u', 't*u', 's^2', 't^2']
-
-        return [ ring( s ) for s in s_lst ]
-
-
-    @staticmethod
-    def change_basis( iqf_lst ):
-        '''
-        INPUT:
-            - "iqf_lst"     -- A list of elements in the subring NF[x0,...,x5] 
-                               of "MARing.R" where NF denotes the Guassian 
-                               rationals QQ(I) with I^2=-1.
-                                                                       
-        OUTPUT:
-            We consider a toric parametrization of the Veronese surface:
-            
-            (s,t)
-            |-->
-            (1  : s*t : s  : t  : s^2 : t^2 )
-            =
-            (x0 : x1  : x2 : x3 : x4  : x5  )
-                                
-            We can put the exponents of the monomials in a lattice
-            where x0 corresponds to coordinate (0,0), x4 to (2,0)
-            and x5 to (0,2):  
-                    
-                  x5 x7 x8      
-                  x3 x1 x6
-                  x0 x2 x4  
-            
-            The monomial parametrization of the Veronese corresponds to the 
-            following lattice polygon:
-            
-                  *
-                  * *
-                  * * * 
-                  
-            An antiholomorphic involution acts on the above lattice polygon 
-            as a unimodular involution:
-                  
-                    ( a, b ) |--> ( b, a)
-        
-            This unimodular lattice involutions induce an involution on P^5: 
-
-                    x0 |--> x0,
-                    x1 |--> x1, 
-                    x2 |--> x2 + I*x3, 
-                    x3 |--> x2 - I*x3,  
-                    x4 |--> x4 + I*x5,
-                    x5 |--> x4 - I*x5,                                  
+                x0 |--> x0,
+                x1 |--> x1, 
+                x2 |--> x2 + I*x3, 
+                x3 |--> x2 - I*x3,  
+                x4 |--> x4 + I*x5,
+                x5 |--> x4 - I*x5,                                  
         '''
 
         I = ring( 'I' )
@@ -147,27 +168,29 @@ class Veronese( object ):
     @staticmethod
     def get_aut_P5( c_lst ):
         '''
-        INPUT: 
-            - "c_lst" -- A list of length 9 with 
-                         elements c0,...,c8 in "MARing.FF". 
-                         The matrix 
-                            
-                                  [ c0 c1 c2 ]
-                              M = [ c3 c4 c5 ]
-                                  [ c6 c7 c8 ]
-                              
-                         represents an automorphism of P^2.
+        Parameters
+        ----------
+        c_lst : list   
+            A list of length 9 with elements c0,...,c8 in "MARing.FF". 
+            The matrix                             
+                [ c0 c1 c2 ]
+            M = [ c3 c4 c5 ]
+                [ c6 c7 c8 ]
+            represents an automorphism of P^2.
                                                              
-        OUTPUT:
-            - This method returns a 6x6 matrix defined over "MARing.FF",
-              which represents a (parametrized) automorphism of P^5
-              that preserves the Veronese surface V. 
+        Returns
+        -------
+        sage_matrix
+            This method returns a 6x6 matrix defined over "MARing.FF",
+            which represents a (parametrized) automorphism of P^5
+            that preserves the Veronese surface V. 
                                                   
-        METHOD:
-            - The Veronese surface V is isomorphic to P^2.
-              The automorphism M of P^2 is via the parametrization 
-              ".get_pmz_lst" represented as an automorphism of P^5. 
-              Algebraically this is the symmetric tensor Sym^2(M).
+        Notes
+        -----
+        The Veronese surface V is isomorphic to P^2.
+        The automorphism M of P^2 is via the parametrization 
+        ".get_pmz_lst" represented as an automorphism of P^5. 
+        Algebraically this is the symmetric tensor Sym^2(M).
         '''
         # obtain parametrization in order to compute Sym^2(M)
         #
@@ -194,7 +217,7 @@ class Veronese( object ):
             for pmz in pmz_lst:
                 row += [spmz.coefficient( pmz )]
             mat += [row]
-        mat = matrix( MARing.FF, mat )
+        mat = sage_matrix( MARing.FF, mat )
 
         MATools.p( 'c_lst =', c_lst )
         MATools.p( 'mat =\n' + str( mat ) )
@@ -205,12 +228,14 @@ class Veronese( object ):
     @staticmethod
     def get_qmat():
         '''
-        OUTPUT:
-            - Returns a symmetric 5x5 matrix with entries
-              in the ring QQ[q0,...,q5] which is a subring 
-              of "MARing.R". It represents the Gramm matrix 
-              of a quadratic form in the ideal of the              
-              Veronese with ideal defined by ".get_ideal_lst()".                        
+        Returns
+        -------
+        sage_matrix
+            A symmetric 5x5 matrix with entries in the 
+            ring QQ[q0,...,q5] which is a subring 
+            of "MARing.R". It represents the Gramm matrix 
+            of a quadratic form in the ideal of the              
+            Veronese with ideal defined by ".get_ideal_lst()".                        
         '''
         x = MARing.x()[:6]
         q = MARing.q()[:6]
@@ -220,8 +245,8 @@ class Veronese( object ):
         for i in range( len( g_lst ) ):
             qpol += q[i] * g_lst[i]
 
-        qmat = invariant_theory.quadratic_form( qpol, x ).as_QuadraticForm().matrix()
-        qmat = Matrix( MARing.R, qmat )
+        qmat = sage_invariant_theory.quadratic_form( qpol, x ).as_QuadraticForm().matrix()
+        qmat = sage_matrix( MARing.R, qmat )
 
         return qmat
 
@@ -229,37 +254,38 @@ class Veronese( object ):
     @staticmethod
     def get_invariant_q_lst( c_lst ):
         '''                        
-        INPUT: 
-            - "c_lst" -- A list of length 9 with elements c0,...,c8 
-                         in the subring in QQ(k)  of "MARing.FF". 
-                         The matrix 
-                            
-                                  [ c0 c1 c2 ]
-                              M = [ c3 c4 c5 ]
-                                  [ c6 c7 c8 ]
-                                                       
-                         represents---for each value of k---an 
-                         automorphism of P^2. If we set k:=0 then 
-                         "c_lst" must correspond to the identity matrix: 
-                         [ 1,0,0, 0,1,0, 0,0,1 ]. If M is not normalized
-                         to have determinant 1 then the method should be 
-                         taken with care (see doc. ".get_c_lst_lst_dct"). 
-                         
-                                                                  
-        OUTPUT:
-            -  Let H be the representation of M in P^5 (see ".get_aut_P5()"). 
-               Thus H corresponds to a 1-parameter subgroup of Aut(P^5), 
-               such that each automorphism preserves the Veronese surface 
-               in projective 5-space P^5.
+        Parameters
+        ---------- 
+        c_lst : list 
+            A list of length 9 with elements c0,...,c8 
+            in the subring in QQ(k)  of "MARing.FF". 
+            The matrix                             
+                [ c0 c1 c2 ]
+            M = [ c3 c4 c5 ]
+                [ c6 c7 c8 ]                                                       
+            represents---for each value of k---an 
+            automorphism of P^2. If we set k:=0 then 
+            "c_lst" must correspond to the identity matrix: 
+            [ 1,0,0, 0,1,0, 0,0,1 ]. If M is not normalized
+            to have determinant 1 then the method should be 
+            taken with care (see doc. ".get_c_lst_lst_dct"). 
+                                                                                     
+        Returns
+        -------
+        list<MARing.R>
+            A list of generators of an ideal J in the subring 
+            QQ[q0,...,q6] of "MARing.R". 
                
-               This method returns a list of generators of an ideal J in the 
-               subring QQ[q0,...,q6] of "MARing.R". 
+            Each point p in the zeroset V(J), when substituted in the matrix 
+                ".get_qmat()",
+            defines a quadratic form in the ideal 
+                ".get_ideal_lst()"
+            that is preserved by a 1-parameter subgroup H,                                         
+            where H is the representation of M in P^5 (see ".get_aut_P5()"). 
+            Thus H corresponds to a 1-parameter subgroup of Aut(P^5), 
+            such that each automorphism preserves the Veronese surface 
+            in projective 5-space P^5.
                
-               Each point p in the zeroset V(J), when substituted in the matrix 
-                   ".get_qmat()",
-               defines a quadratic form in the ideal 
-                   ".get_ideal_lst()"
-               that is preserved by the 1-parameter subgroup H.                                        
         '''
         # get representation of 1-parameter subgroup in Aut(P^5)
         #
@@ -288,25 +314,27 @@ class Veronese( object ):
     @staticmethod
     def get_invariant_qf( c_lst_lst ):
         '''
-        INPUT:        
-          - "c_lst_lst" --  A list of "c_lst"-lists.
-                            A c_lst is a list of length 9 with elements 
-                            c0,...,c8 in the subring in QQ(k)  of "MARing.FF". 
-                            The matrix 
-                            
-                                  [ c0 c1 c2 ]
-                              M = [ c3 c4 c5 ]
-                                  [ c6 c7 c8 ]
-                                                         
-                            represents---for each value of k---an 
-                            automorphism of P^2. If we set k:=0 then 
-                            "c_lst" must correspond to the identity matrix: 
-                            [ 1,0,0, 0,1,0, 0,0,1 ]. If M is not normalized
-                            to have determinant 1 then the method should be 
-                            taken with care (see doc. ".get_c_lst_lst_dct").         
+        Parameters
+        ----------    
+        c_lst_lst : list 
+            A list of "c_lst"-lists.
+            A c_lst is a list of length 9 with elements 
+            c0,...,c8 in the subring in QQ(k)  of "MARing.FF". 
+            The matrix                         
+                [ c0 c1 c2 ]
+            M = [ c3 c4 c5 ]
+                [ c6 c7 c8 ]                                                         
+            represents---for each value of k---an 
+            automorphism of P^2. If we set k:=0 then 
+            "c_lst" must correspond to the identity matrix: 
+            [ 1,0,0, 0,1,0, 0,0,1 ]. If M is not normalized
+            to have determinant 1 then the method should be 
+            taken with care (see doc. ".get_c_lst_lst_dct").         
         
-        OUTPUT:
-         -- A list of quadratic forms in the ideal of the Veronese surface V
+        Returns
+        -------
+        list<MARing.R>
+            A list of quadratic forms in the ideal of the Veronese surface V
             (see ".get_ideal_lst()"), such that the quadratic forms are 
             invariant under the automorphisms of V as defined by "c_lst_lst"
             and such that the quadratic forms generate the module of  
@@ -340,7 +368,7 @@ class Veronese( object ):
         # associated to the symmetric matrix qmat.
         #
         qmat = Veronese.get_qmat()
-        qpol = list( vector( x ).row() * qmat * vector( x ).column() )[0][0]
+        qpol = list( sage_vector( x ).row() * qmat * sage_vector( x ).column() )[0][0]
         sqpol = qpol.subs( sol_dct )
         mt.p( 'sqpol   =', sqpol )
         mt.p( 'r       =', r )
@@ -358,17 +386,19 @@ class Veronese( object ):
     @staticmethod
     def get_c_lst_lst_dct():
         '''
-        OUTPUT:
-          - Returns a dictionary "dct" whose keys are one of the following:            
+        Returns
+        -------
+        dict
+            A dictionary "dct" whose keys are one of the following:            
               
               dct['SL3(C)'] : @ complex sl3
               dct['SO3(R)'] : @ real so3 
               
             where the symbol @ is shorthand for the sentence:
                 
-                @="A list of 1-parameter subgroups, such that the tangent vectors 
-                     of the corresponding curves at the identity generate the Lie 
-                     algebra:"
+                @=" A list of 1-parameter subgroups, such that the tangent vectors 
+                    of the corresponding curves at the identity generate the Lie 
+                    algebra: "
               
             Thus the values of "dct" are lists of 8 "c_lst" lists, so that each 
             "c_lst" represents a 1-parameter subgroup of SL3 and the tangent

@@ -74,6 +74,10 @@ def sage__eval( *args, **kwargs ):
 def sage_n( *args, **kwargs ):
     return n( *args, **kwargs )
 
+# from sage.misc.misc import set_verbose
+def sage_set_verbose( *args, **kwargs ):
+    return set_verbose( *args, **kwargs )
+
 
 #################################################
 # sage.functions                                #

@@ -12,6 +12,7 @@ from moebius_aut.sage_interface import sage_matrix
 from moebius_aut.sage_interface import sage_vector
 from moebius_aut.sage_interface import sage_invariant_theory
 
+
 class DSegre( object ):
     '''
     This class represents the Veronese-Segre embedding of P^1xP^1 

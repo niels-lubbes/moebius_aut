@@ -3,9 +3,12 @@ Use of this source code is governed by a MIT-style license that can be found in 
 Created on Apr 4, 2017
 @author: Niels Lubbes
 '''
-from sage.all import *
+
+from moebius_aut.sage_interface import sage_matrix
+from moebius_aut.sage_interface import sage_QQ
 
 from moebius_aut.class_veronese import Veronese
+
 from moebius_aut.class_ma_ring import ring
 from moebius_aut.class_ma_ring import MARing
 
@@ -86,11 +89,11 @@ class TestClassVeronese( object ):
             for c_lst in Veronese.get_c_lst_lst_dct()[key]:
                 print( 'key   =', key )
                 print( 'c_lst =', c_lst )
-                print( 'det   =', matrix( 3, 3, c_lst ).det() )
+                print( 'det   =', sage_matrix( 3, 3, c_lst ).det() )
 
                 n_lst = []
                 for c in c_lst:
-                    if c in QQ:
+                    if c in sage_QQ:
                         n_lst += [c]
                     else:
                         n_lst += [c.subs( {k:0} )]
@@ -98,7 +101,7 @@ class TestClassVeronese( object ):
                 print
 
                 if key != 'SO3(R)':
-                    assert matrix( 3, 3, c_lst ).det() == 1
+                    assert sage_matrix( 3, 3, c_lst ).det() == 1
                 assert n_lst == [1, 0, 0, 0, 1, 0, 0, 0, 1]
 
 
