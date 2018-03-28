@@ -11,19 +11,14 @@ https://pypi.python.org/pypi?%3Aaction=list_classifiers
 from setuptools import setup
 
 
-def readme():
-    with open( 'README.md' ) as f:
-        return f.read()
-
-
 setup( name = 'moebius_aut',
        version = '0',
        description = 'Moebius automorphisms of surfaces',
-       long_description = readme(),
        classifiers = [
            'Development Status :: 3 - Alpha',
            'License :: OSI Approved :: MIT License',
-           'Programming Language :: Python :: 3.6',
+           'Programming Language :: Python :: 2',
+           'Programming Language :: Python :: 3',
            'Topic :: Scientific/Engineering :: Mathematics',
            ],
       keywords = 'surfaces automorphisms circles',
@@ -32,8 +27,6 @@ setup( name = 'moebius_aut',
       license = 'MIT',
       package_dir = {'': 'src'},
       packages = ['moebius_aut'],
-      # install_requires = ['markdown'],
-      # dependency_links = ['http://github.com/niels-lubbes/linear_series/tarball/master#egg=package-1.0'],
       test_suite = 'nose.collector',
       tests_require = ['nose'],
       entry_points = {
