@@ -35,7 +35,7 @@ class MATools():
 
     # private static variables used by ".p()"
     #
-    __filter_fname = None
+    __filter_fname = 'no output'
     __prev_filter_fname = None
 
 
