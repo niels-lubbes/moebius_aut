@@ -185,6 +185,27 @@ on the square.
     leftright:   ( a, b ) |--> (-a, b)
     rotate:      ( a, b ) |--> (-a,-b)  
     diagonal:    ( a, b ) |--> ( b, a)
+    
+and acts as an antiholomorphic involution on P^8, which is defined respectively
+one of the following maps composed with complex conjugation: 
+    
+    identity: (x0:...:x8) |--> (x0:...:x8) 
+    
+    leftright:  x3 |--> x3, x0 |--> x0, x4 |--> x4,                     
+                x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
+                x5 |--> x5 + I*x8, x8 |--> x5 - I*x8,                                
+                x7 |--> x7 + I*x6, x6 |--> x7 - I*x6 
+                         
+    rotate: x0 |--> x0,
+            x1 |--> x1 + I*x2, x2 |--> x1 - I*x2, 
+            x3 |--> x3 + I*x4, x4 |--> x3 - I*x4, 
+            x5 |--> x5 + I*x6, x6 |--> x5 - I*x6, 
+            x7 |--> x7 + I*x8, x8 |--> x7 - I*x8      
+                    
+    diagonal:   x0 |--> x0, x5 |--> x5, x6 |--> x6,
+                x3 |--> x3 + I*x1,  x1 |--> x3 - I*x1,
+                x8 |--> x8 + I*x7,  x7 |--> x8 - I*x7,
+                x2 |--> x2 + I*x4,  x4 |--> x2 - I*x4  
 
 We obtain a parametrization of a toric projection of the double Segre surface
 by omitting monomials from the the above parametrization.
