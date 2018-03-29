@@ -193,9 +193,9 @@ if we compose the parametrization of the double Segre surface with the linear pr
 and if the set the involution to 'rotate'. We schematically denote this as    
     
     -= del Pezzo surface of degree 6 =-
-    [* *  ]   
-    [* * *]   
-    [  * *]
+        [* *  ]   
+        [* * *]   
+        [  * *]
     exc_idx_lst = [5,6]   
     involution='rotate'
 
@@ -210,51 +210,51 @@ at least conics through each point
     involution in ['identity', 'rotate', 'leftright']
 
     -= del Pezzo surface of degree 6 =- 
-    [* *  ]   
-    [* * *]   
-    [  * *]
+        [* *  ]   
+        [* * *]   
+        [  * *]
     exc_idx_lst = [5,6]   
     involution='rotate'
 
     -= weak del Pezzo surface of degree 6 =-
-    [  *  ]   
-    [* * *]   
-    [* * *]   
+        [  *  ]   
+        [* * *]   
+        [* * *]   
     exc_idx_lst = [5,8]   
     involution='leftright'
 
     -= Veronese surface =-
-    [*    ]
-    [* *  ]
-    [* * *]
+        [*    ]
+        [* *  ]
+        [* * *]
     exc_idx_lst = [1,3,5]   
     involution in ['identity','diagonal']
               
     -= ring cyclide =-          
-    [  *  ]             
-    [* * *]             
-    [  *  ] 
+        [  *  ]             
+        [* * *]             
+        [  *  ] 
     exc_idx_lst = [5,6,7,8]   
     involution='rotate'
 
     -= horn cyclide =-    
-    [  *  ]   
-    [* * *]   
-    [  *  ]  
+        [  *  ]   
+        [* * *]   
+        [  *  ]  
     exc_idx_lst = [5,6,7,8]   
     involution='leftright'     
     
     -= spindle cyclide =-
-    [  *  ]   
-    [  *  ]   
-    [* * *]   
+        [  *  ]   
+        [  *  ]   
+        [* * *]   
     exc_idx_lst = [1,2,5,8]   
     involution='leftright'       
     
     -= 2-sphere =-
-    [     ]
-    [* *  ]
-    [* *  ]
+        [     ]
+        [* *  ]
+        [* *  ]
     exc_idx_lst = [1,3,5,7,8]   
     involution='diagonal'       
 ```
