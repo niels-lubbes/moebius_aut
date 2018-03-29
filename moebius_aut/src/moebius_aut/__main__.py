@@ -539,11 +539,11 @@ def usecase__classification( cache = True ):
     ----------
     cache : bool
         If True, then the cached result is used,
-        otherwise the output is recomputed. This 
-        may take about 9 hours.
+        otherwise the output is recomputed. The 
+        computation may take about 9 hours.
     '''
     key = 'usecase__classification'
-    if key in MATools.get_tool_dct():
+    if cache and key in MATools.get_tool_dct():
         mt.p( MATools.get_tool_dct()[key] )
         return
 
@@ -726,14 +726,11 @@ if __name__ == '__main__':
     for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
         usecase__invariant_quadratic_forms( case )
 
-    import sys
-    sys.exit()
-
     usecase__invariant_quadratic_forms_experiment()
 
     usecase__toric_invariant_celestials()
     usecase__horn_and_spindle_cyclides()
-    # usecase__classification()  # takes about 9 hours
+    usecase__classification( True )
 
     for case in ['1a', '1b', 'sl3', 'so3']:
         usecase__invariant_quadratic_forms_veronese( case )
