@@ -3,10 +3,9 @@
 
 ## Introduction
 
-Moebius-aut is a Python library for constructing surfaces that with prescribed Moebius automorphisms.
-The surfaces that are constructed contain at least two conics through each point.
-Algebraically, this library computes quadratic forms in an ideal that are invariant under subgroups
-of SL(2)xSL(2) and SL(3).  
+Moebius-aut is a python library that computes G-invariant quadratic forms in the ideal of surfaces.
+In this implementation we consider surfaces that are projections of the double Segre surface 
+or Veronese surface. The group G is assumed to be a subgroup of SL(2)xSL(2) or SL(3).  
 
 This library depends on [SageMath](https://SageMath.org) libraries.
 
@@ -162,7 +161,7 @@ that is invariant under a 2-dimensional subgroup SO(2)xSO(2) of Aut(S^5).
 Notice that S^5 is a quadric of signature (1,5+1). 
 
 
-### Internal representation of projections of double Segre surface and their real structures
+### Internal representation of projections of the double Segre surface and their real structures
 
 In this section we explain the `exc_idx_lst` and `involution` parameters.
 
