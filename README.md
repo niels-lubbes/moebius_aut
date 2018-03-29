@@ -152,7 +152,8 @@ print( iq_lst )
 sig_lst = MARing.get_rand_sigs( iq_lst, 10 )
 print( sig_lst )
 ```
-Output:    
+Output:
+    
     [x0^2 - x7*x8, x0^2 - x3*x4, x0^2 - x1*x2] 
     [x0^2 - x7^2 - x8^2, x0^2 - x3^2 - x4^2, x0^2 - x1^2 - x2^2]
     [[1, 2], [1, 4], [1, 6], [2, 3], [2, 5], [3, 4]]
