@@ -203,11 +203,11 @@ and if the set the involution to 'rotate'. We schematically denote this as
 Below we give an overview of choices for normal toric surfaces that contain
 at least conics through each point
 
-| double Segre surface |
-|   
-|        [* * *]       |        
-|        [* * *]       | 
-|        [* * *]       |    
+| double Segre surface |del Pezzo surface of degree 6 |
+|:--------------------:|:----------------------------:|     
+|        `[* * *]`      |        `[* *  ]`              |          
+|        `[* * *]`      |        `[* * *]`              |   
+|        `[* * *]`      |        `[  * *]`              |      
 
 
     -= double Segre surface =-
