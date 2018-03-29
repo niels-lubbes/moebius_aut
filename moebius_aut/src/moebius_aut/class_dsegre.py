@@ -11,6 +11,7 @@ from moebius_aut.class_ma_ring import MARing
 from moebius_aut.sage_interface import sage_matrix
 from moebius_aut.sage_interface import sage_vector
 from moebius_aut.sage_interface import sage_invariant_theory
+from moebius_aut.sage_interface import sage_set_verbose
 
 
 class DSegre( object ):
@@ -492,6 +493,7 @@ class DSegre( object ):
         # for verbose output
         #
         mt = MATools()
+        sage_set_verbose( -1 )
 
         # initialize vectors for indeterminates of "MARing.R"
         #
