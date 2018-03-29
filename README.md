@@ -179,15 +179,16 @@ We schematically denote this correspondence by the following square:
     [6 4 7]
 
 The antiholomorphic involution defined by the real structure acts as unimodular involution
-on the square.     
+on the square:     
 
     identity:    ( a, b ) |--> ( a, b)
     leftright:   ( a, b ) |--> (-a, b)
     rotate:      ( a, b ) |--> (-a,-b)  
     diagonal:    ( a, b ) |--> ( b, a)
     
-and acts as an antiholomorphic involution on P^8, which is defined respectively
-one of the following maps composed with complex conjugation: 
+Moreover, the real structure acts as an antiholomorphic involution on P^8. 
+We consider antiholomorphic involutions that are defined by one of the following maps 
+composed with complex conjugation: 
     
     identity: (x0:...:x8) |--> (x0:...:x8) 
     
@@ -207,9 +208,6 @@ one of the following maps composed with complex conjugation:
                 x8 |--> x8 + I*x7,  x7 |--> x8 - I*x7,
                 x2 |--> x2 + I*x4,  x4 |--> x2 - I*x4  
 
-We obtain a parametrization of a toric projection of the double Segre surface
-by omitting monomials from the the above parametrization.
-
 For example we obtain a parametrization of a smooth Del Pezzo surface of degree 6, 
 if we set `involution='rotate'` and compose the parametrization of the double Segre surface 
 with the linear projection 
@@ -226,7 +224,7 @@ We schematically denote this as
     involution='rotate'
 
 Below we give an overview of choices for normal toric surfaces that contain
-at least conics through each point
+at least circles through each point
 
     -= double Segre surface =-                 -= del Pezzo surface of degree 6 =-   
         [* * *]                                    [* *  ]                           
