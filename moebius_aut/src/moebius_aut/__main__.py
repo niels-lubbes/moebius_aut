@@ -715,6 +715,7 @@ if __name__ == '__main__':
 
     mt.start_timer()
     mt.filter( '__main__.py' )  # output only from this module
+    # mt.filter_unset()  # output will not be surpressed
     sage_set_verbose( -1 )  # surpresses warning message for slow for Groebner basis.
 
 
@@ -724,6 +725,9 @@ if __name__ == '__main__':
 
     for case in ['087', '287', '365', '265s', '265t', '443', '243ss', '243st']:
         usecase__invariant_quadratic_forms( case )
+
+    import sys
+    sys.exit()
 
     usecase__invariant_quadratic_forms_experiment()
 
