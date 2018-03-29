@@ -158,17 +158,17 @@ Output:
     [x0^2 - x7^2 - x8^2, x0^2 - x3^2 - x4^2, x0^2 - x1^2 - x2^2]
     [[1, 2], [1, 4], [1, 6], [2, 3], [2, 5], [3, 4]]
 
-Below we explain the "exc_idx_lst" and "involution" parameters.
-``` 
-We fix the following monomial parametrization of the double Segre surface 
+
+Below we explain the `exc_idx_lst` and `involution` parameters.
+We fix the following monomial parametrization of the double Segre surface
 
     (s,u) |--> (1:s:s^{-1}:u:u^{-1}:s*u:s^{-1}*u^{-1}:s*u^{-1}:s^{-1}*u)
                =
                (x0:x1:x2:x3:x4:x5:x6:x7:x8)
 
 We consider the exponents of the monomials as coordinates in a lattice.
-Thus, for example, 1=s^0*t^0 corresponds to the coordinate (0,0) which corresponds to x0
-and the monomial s*u^{-1} corresponds to the coordinate (1,-1) which corresponds to x7, etc.
+Thus, for example, `1=s^0*t^0` corresponds to the coordinate (0,0) which corresponds to `x0`
+and the monomial `s*u^{-1}` corresponds to the coordinate (1,-1) which corresponds to `x7`, etc.
 We schematically denote this correspondence by the following square:
 
     [8 3 5]    
@@ -202,6 +202,13 @@ and if the set the involution to 'rotate'. We schematically denote this as
 
 Below we give an overview of choices for normal toric surfaces that contain
 at least conics through each point
+
+| double Segre surface |
+|   
+|        [* * *]       |        
+|        [* * *]       | 
+|        [* * *]       |    
+
 
     -= double Segre surface =-
         [* * *]        
@@ -258,7 +265,6 @@ at least conics through each point
         [* *  ]
     exc_idx_lst = [1,3,5,7,8]   
     involution='diagonal'       
-```
 
 
 __Example 3: Computing G-invariant quadratic forms in the ideal of the Veronese surface__
