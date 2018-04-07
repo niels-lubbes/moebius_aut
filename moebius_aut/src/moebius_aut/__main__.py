@@ -21,8 +21,6 @@ from moebius_aut.class_ma_ring import MARing
 from moebius_aut.class_dsegre import DSegre
 from moebius_aut.class_veronese import Veronese
 
-mt = MATools()
-
 
 def usecase__invariant_quadratic_forms( case ):
     '''
@@ -198,21 +196,21 @@ def usecase__invariant_quadratic_forms( case ):
     for ei in range( 0, 9 ):
         new_mat_str = new_mat_str.replace( str( ei ), '*' )
 
-    mt.p( '\n' + 80 * '-' )
-    mt.p( 'case        :', case )
-    mt.p( 'description :\n', descr + '\n' + mat_str + '\n\n' + new_mat_str )
-    mt.p( 'G           :', infoG )
-    mt.p( 'exc_idx_lst :', exc_idx_lst )
-    mt.p( 'involution  :', involution )
-    mt.p( 'G-invariant quadratic forms:' )
+    MATools.p( '\n' + 80 * '-' )
+    MATools.p( 'case        :', case )
+    MATools.p( 'description :\n', descr + '\n' + mat_str + '\n\n' + new_mat_str )
+    MATools.p( 'G           :', infoG )
+    MATools.p( 'exc_idx_lst :', exc_idx_lst )
+    MATools.p( 'involution  :', involution )
+    MATools.p( 'G-invariant quadratic forms:' )
     for iq in iq_lst:
-        mt.p( '\t', iq )
-    mt.p( 'random signatures:' )
-    mt.p( '\t', sig_lst )
+        MATools.p( '\t', iq )
+    MATools.p( 'random signatures:' )
+    MATools.p( '\t', sig_lst )
     for sig in sig_lst:
         if 1 in sig:
-            mt.p( '\t', sig )
-    mt.p( '\n' + 80 * '-' )
+            MATools.p( '\t', sig )
+    MATools.p( '\n' + 80 * '-' )
 
 
 def usecase__invariant_quadratic_forms_experiment():
@@ -239,20 +237,20 @@ def usecase__invariant_quadratic_forms_experiment():
     exc_idx_lst = []
     c_lst_lst = [ s + e, e + t ]
     involution = 'leftright'
-    mt.p( 'exc_idx_lst =', exc_idx_lst )
-    mt.p( 'c_lst_lst   =', DSegre.to_str( c_lst_lst ) )
-    mt.p( 'involution  =', involution )
-    mt.p( '---' )
+    MATools.p( 'exc_idx_lst =', exc_idx_lst )
+    MATools.p( 'c_lst_lst   =', DSegre.to_str( c_lst_lst ) )
+    MATools.p( 'involution  =', involution )
+    MATools.p( '---' )
 
     #
     # compute vector space of real invariant quadratic forms.
     #
     iq_lst = DSegre.get_invariant_qf( c_lst_lst, exc_idx_lst )
-    mt.p( 'invariant quadratic forms =\n\t', iq_lst )
+    MATools.p( 'invariant quadratic forms =\n\t', iq_lst )
     iq_lst = DSegre.change_basis( iq_lst, involution )
-    mt.p( 'change basis              =\n\t', iq_lst )
+    MATools.p( 'change basis              =\n\t', iq_lst )
     iq_lst = MARing.replace_conj_pairs( iq_lst )
-    mt.p( 'replaced conjugate pairs  =\n\t', iq_lst )
+    MATools.p( 'replaced conjugate pairs  =\n\t', iq_lst )
 
 
 def usecase__toric_invariant_celestials():
@@ -359,16 +357,16 @@ def usecase__toric_invariant_celestials():
             # output info
             #
             if not JP.is_zero():
-                mt.p( 10 * '-' )
-                mt.p( 'set of i such that <xi for i in P> is the ideal of the center of projection:' )
-                mt.p( '\t', P )
-                mt.p( 'projection of double Segre surface wrt. P:' )
+                MATools.p( 10 * '-' )
+                MATools.p( 'set of i such that <xi for i in P> is the ideal of the center of projection:' )
+                MATools.p( '\t', P )
+                MATools.p( 'projection of double Segre surface wrt. P:' )
                 for gen in JP.gens():
-                    mt.p( '\t', gen )
+                    MATools.p( '\t', gen )
                     for involution in ['leftright', 'rotate']:
-                        mt.p( '\t\t', involution, '\t', DSegre.change_basis( [ring( gen )], involution ) )
-                mt.p( 'hilbert polynomial ((deg/dim!)*t^(dim)+...):' )
-                mt.p( '\t', hpol )
+                        MATools.p( '\t\t', involution, '\t', DSegre.change_basis( [ring( gen )], involution ) )
+                MATools.p( 'hilbert polynomial ((deg/dim!)*t^(dim)+...):' )
+                MATools.p( '\t', hpol )
 
 
 def usecase__horn_and_spindle_cyclides():
@@ -442,28 +440,28 @@ def usecase__horn_and_spindle_cyclides():
         prj_lst = S.ideal( [G1, G2] + smap ).elimination_ideal( [x0, x1, x2, x3, x4] ).gens()
         eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
 
-        mt.p( 80 * '-' )
-        mt.p( 'HORN CYCLIDE' )
-        mt.p( 80 * '-' )
-        mt.p( 'We define a projective automorphism m:P^4--->P^4' )
-        mt.p( '\t a   = 1/sqrt(2)' )
-        mt.p( '\t m34 =', list( m34 ) )
-        mt.p( '\t m04 =', list( m04 ) )
-        mt.p( '\t m = m34 * m04 =', list( m ) )
-        mt.p( '\t det(m) =', m.det() )
-        mt.p( '\t v |--> m*v =', v, '|-->', m * v )
-        mt.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
-        mt.p( '\t g1 =', g1 )
-        mt.p( '\t g2 =', g2 )
-        mt.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
-        mt.p( '\t G1 =', G1 )
-        mt.p( '\t G2 =', G2 )
-        mt.p( '\t G2-2*G1 =', G2 - 2 * G1 )
-        mt.p( 'Stereographic projection to circular quadratic cone:' )
-        mt.p( '\t smap    =', smap, '(stereographic projection map)' )
-        mt.p( '\t prj_lst =', prj_lst )
-        mt.p( '\t eqn     =', eqn )
-        mt.p( 80 * '-' + 2 * '\n' )
+        MATools.p( 80 * '-' )
+        MATools.p( 'HORN CYCLIDE' )
+        MATools.p( 80 * '-' )
+        MATools.p( 'We define a projective automorphism m:P^4--->P^4' )
+        MATools.p( '\t a   = 1/sqrt(2)' )
+        MATools.p( '\t m34 =', list( m34 ) )
+        MATools.p( '\t m04 =', list( m04 ) )
+        MATools.p( '\t m = m34 * m04 =', list( m ) )
+        MATools.p( '\t det(m) =', m.det() )
+        MATools.p( '\t v |--> m*v =', v, '|-->', m * v )
+        MATools.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
+        MATools.p( '\t g1 =', g1 )
+        MATools.p( '\t g2 =', g2 )
+        MATools.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
+        MATools.p( '\t G1 =', G1 )
+        MATools.p( '\t G2 =', G2 )
+        MATools.p( '\t G2-2*G1 =', G2 - 2 * G1 )
+        MATools.p( 'Stereographic projection to circular quadratic cone:' )
+        MATools.p( '\t smap    =', smap, '(stereographic projection map)' )
+        MATools.p( '\t prj_lst =', prj_lst )
+        MATools.p( '\t eqn     =', eqn )
+        MATools.p( 80 * '-' + 2 * '\n' )
 
     if True:
         #
@@ -504,26 +502,26 @@ def usecase__horn_and_spindle_cyclides():
         eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
 
 
-        mt.p( 80 * '-' )
-        mt.p( 'SPINDLE CYCLIDE' )
-        mt.p( 80 * '-' )
-        mt.p( 'We define a projective automorphism m:P^4--->P^4' )
-        mt.p( '\t a   = 1/sqrt(2)' )
-        mt.p( '\t m =', list( m ) )
-        mt.p( '\t det(m) =', m.det() )
-        mt.p( '\t v |--> m*v =', v, '|-->', m * v )
-        mt.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
-        mt.p( '\t g1 =', g1 )
-        mt.p( '\t g2 =', g2 )
-        mt.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
-        mt.p( '\t G1 =', G1 )
-        mt.p( '\t G2 =', G2 )
-        mt.p( '\t G2-2*G1 =', G2 - 2 * G1 )
-        mt.p( 'Stereographic projection to circular cylinder:' )
-        mt.p( '\t smap    =', smap, '(stereographic projection map)' )
-        mt.p( '\t prj_lst =', prj_lst )
-        mt.p( '\t eqn     =', eqn )
-        mt.p( 80 * '-' + 2 * '\n' )
+        MATools.p( 80 * '-' )
+        MATools.p( 'SPINDLE CYCLIDE' )
+        MATools.p( 80 * '-' )
+        MATools.p( 'We define a projective automorphism m:P^4--->P^4' )
+        MATools.p( '\t a   = 1/sqrt(2)' )
+        MATools.p( '\t m =', list( m ) )
+        MATools.p( '\t det(m) =', m.det() )
+        MATools.p( '\t v |--> m*v =', v, '|-->', m * v )
+        MATools.p( 'Generators of ideal of cyclide in quadric of signature [1,4]:' )
+        MATools.p( '\t g1 =', g1 )
+        MATools.p( '\t g2 =', g2 )
+        MATools.p( 'Generators of ideal of cyclide in S^3 after applying m:' )
+        MATools.p( '\t G1 =', G1 )
+        MATools.p( '\t G2 =', G2 )
+        MATools.p( '\t G2-2*G1 =', G2 - 2 * G1 )
+        MATools.p( 'Stereographic projection to circular cylinder:' )
+        MATools.p( '\t smap    =', smap, '(stereographic projection map)' )
+        MATools.p( '\t prj_lst =', prj_lst )
+        MATools.p( '\t eqn     =', eqn )
+        MATools.p( 80 * '-' + 2 * '\n' )
 
 
 def usecase__classification( cache = True ):
@@ -544,7 +542,7 @@ def usecase__classification( cache = True ):
     '''
     key = 'usecase__classification'
     if cache and key in MATools.get_tool_dct():
-        mt.p( MATools.get_tool_dct()[key] )
+        MATools.p( MATools.get_tool_dct()[key] )
         return
 
     out = ''
@@ -586,7 +584,7 @@ def usecase__classification( cache = True ):
             tmp += '\n\t' + 10 * '-'
 
             # output obtained info to screen
-            mt.p( tmp )
+            MATools.p( tmp )
 
             # add to output string
             out += tmp
@@ -694,28 +692,30 @@ def usecase__invariant_quadratic_forms_veronese( case ):
     #
     while descr != descr.replace( '  ', ' ' ):
         descr = descr.replace( '  ', ' ' )
-    mt.p( '\n' + 80 * '-' )
-    mt.p( 'case        :', case )
-    mt.p( 'description :\n', descr )
-    mt.p( 'G           :', infoG )
-    mt.p( 'involution  :', involution )
-    mt.p( 'G-invariant quadratic forms:' )
+    MATools.p( '\n' + 80 * '-' )
+    MATools.p( 'case        :', case )
+    MATools.p( 'description :\n', descr )
+    MATools.p( 'G           :', infoG )
+    MATools.p( 'involution  :', involution )
+    MATools.p( 'G-invariant quadratic forms:' )
     for iq in iq_lst:
-        mt.p( '\t', iq )
-    mt.p( 'random signatures:' )
-    mt.p( '\t', sig_lst )
+        MATools.p( '\t', iq )
+    MATools.p( 'random signatures:' )
+    MATools.p( '\t', sig_lst )
     for sig in sig_lst:
         if 1 in sig:
-            mt.p( '\t', sig )
-    mt.p( '\n' + 80 * '-' )
+            MATools.p( '\t', sig )
+    MATools.p( '\n' + 80 * '-' )
 
 
 
 if __name__ == '__main__':
 
     mt.start_timer()
-    mt.filter( '__main__.py' )  # output only from this module
-    # mt.filter_unset()  # output will not be surpressed
+    mod_lst = []
+    mod_lst += ['__main__.py']
+    MATools.filter( mod_lst )  # output only from specified modules
+    # MATools.filter( None )  # uncomment for showing all debug output
     sage_set_verbose( -1 )  # surpresses warning message for slow for Groebner basis.
 
 

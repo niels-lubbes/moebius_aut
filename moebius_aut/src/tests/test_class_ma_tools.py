@@ -11,22 +11,20 @@ class TestClassMATools:
 
     def test__p( self ):
 
-        ma = MATools()
+        MATools().filter( None )
+        assert MATools().p( 'Hello world!' ) != None
 
-        ma.filter( None )
-        assert ma.p( 'Hello world!' ) != None
+        MATools().filter( ['another_class.py'] )
+        assert MATools().p( 'No output since called from another class.' ) == None
 
-        ma.filter( 'another_class.py' )
-        assert ma.p( 'No output since called from another class.' ) == None
+        MATools().filter_unset()
+        assert MATools().p( 'Filter is disabled so output this string.' ) != None
 
-        ma.filter_unset()
-        assert ma.p( 'Filter is disabled so output this string.' ) != None
+        MATools().filter_reset()
+        assert MATools().p( 'Filter is enabled again so do not output.' ) == None
 
-        ma.filter_reset()
-        assert ma.p( 'Filter is enabled again so do not output.' ) == None
-
-        ma.filter( 'test_class_ma_tools.py' )
-        assert ma.p( 'Only output if called from this class' ) != None
+        MATools().filter( ['test_class_ma_tools.py'] )
+        assert MATools().p( 'Only output if called from this class' ) != None
 
 
     def test__tool_dct( self ):
