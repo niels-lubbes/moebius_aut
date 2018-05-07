@@ -3,9 +3,10 @@
 
 # Setuptools distribution folder.
 /dist/
+/build/
 
 # Python egg metadata, regenerated from source files by setuptools.
-/src/*.egg-info
+*.egg-info
 
 # created by test_class_ma_tools
 /src/moebius_aut/test_tools.sobj
