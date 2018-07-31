@@ -711,7 +711,7 @@ def usecase__invariant_quadratic_forms_veronese( case ):
 
 if __name__ == '__main__':
 
-    mt.start_timer()
+    MATools.start_timer()
     mod_lst = []
     mod_lst += ['__main__.py']
     MATools.filter( mod_lst )  # output only from specified modules
@@ -737,7 +737,7 @@ if __name__ == '__main__':
 
     ###############################################
 
-    mt.end_timer()
+    MATools.stop_timer()
     print
     print( 'The End' )
 
