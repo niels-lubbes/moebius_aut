@@ -132,6 +132,45 @@ class TestClassDSegre:
         assert out == ring( chk_mat )
 
 
+    def test__get_aut_P8__moduli( self ):
+
+        a, b, c, d, e, f, g, h = ring( 'a, b, c, d, e, f, g, h' )
+        M = DSegre.get_aut_P8( [a, b, c, d, e, f, g, h] )
+
+        print( M )
+
+        x = ring( '[x0, x1, x2, x3, x4, x5, x6, x7, x8]' )
+        y = ring( '[y0, y1, y2, y3, y4, y5, y6, y7, y8]' )
+        My = M * sage_vector( y )
+        dct = {x[i]:My[i] for i in range( 9 )}
+
+        pol = ring( 'x0^2-x1*x2' )
+        print( pol.subs( dct ) )
+
+        # We may use this to check the dimension of the moduli space
+        # of invariant quadratic forms, since coefficients of some of the
+        # terms are necessarily 0.
+        #
+        chk = ''
+        chk += '(b^2*c^2*f^2*g^2 - 2*a*b*c*d*f^2*g^2 + a^2*d^2*f^2*g^2 + 2*b^2*c^2*e*f*g*h - 4*a*b*c*d*e*f*g*h + 2*a^2*d^2*e*f*g*h + b^2*c^2*e^2*h^2 - 2*a*b*c*d*e^2*h^2 + a^2*d^2*e^2*h^2 )*y0^2  + '
+        chk += '(-b^2*c^2*f^2*g^2 + 2*a*b*c*d*f^2*g^2 - a^2*d^2*f^2*g^2 - 2*b^2*c^2*e*f*g*h + 4*a*b*c*d*e*f*g*h - 2*a^2*d^2*e*f*g*h - b^2*c^2*e^2*h^2 + 2*a*b*c*d*e^2*h^2 - a^2*d^2*e^2*h^2)*y1*y2 + '
+        chk += '(2*b^2*c^2*e*f*g*h - 4*a*b*c*d*e*f*g*h + 2*a^2*d^2*e*f*g*h                                                                                                                 )*y3*y4 + '
+        chk += '(-b^2*c^2*e*f*g*h + 2*a*b*c*d*e*f*g*h - a^2*d^2*e*f*g*h                                                                                                                    )*y5*y6 + '
+        chk += '(-b^2*c^2*e*f*g*h + 2*a*b*c*d*e*f*g*h - a^2*d^2*e*f*g*h                                                                                                                    )*y7*y8 + '
+        chk += '(b^2*c^2*e^2*g^2 - 2*a*b*c*d*e^2*g^2 + a^2*d^2*e^2*g^2                                                                                                                     )*y3^2  + '
+        chk += '(b^2*c^2*f^2*h^2 - 2*a*b*c*d*f^2*h^2 + a^2*d^2*f^2*h^2                                                                                                                     )*y4^2  + '
+        chk += '(2*b^2*c^2*e*f*g^2 - 4*a*b*c*d*e*f*g^2 + 2*a^2*d^2*e*f*g^2 + 2*b^2*c^2*e^2*g*h - 4*a*b*c*d*e^2*g*h + 2*a^2*d^2*e^2*g*h                                                     )*y0*y3 + '
+        chk += '(2*b^2*c^2*f^2*g*h - 4*a*b*c*d*f^2*g*h + 2*a^2*d^2*f^2*g*h + 2*b^2*c^2*e*f*h^2 - 4*a*b*c*d*e*f*h^2 + 2*a^2*d^2*e*f*h^2                                                     )*y0*y4 + '
+        chk += '(-b^2*c^2*e*f*g^2 + 2*a*b*c*d*e*f*g^2 - a^2*d^2*e*f*g^2 - b^2*c^2*e^2*g*h + 2*a*b*c*d*e^2*g*h - a^2*d^2*e^2*g*h                                                            )*y2*y5 + '
+        chk += '(-b^2*c^2*f^2*g*h + 2*a*b*c*d*f^2*g*h - a^2*d^2*f^2*g*h - b^2*c^2*e*f*h^2 + 2*a*b*c*d*e*f*h^2 - a^2*d^2*e*f*h^2                                                            )*y1*y6 + '
+        chk += '(-b^2*c^2*f^2*g*h + 2*a*b*c*d*f^2*g*h - a^2*d^2*f^2*g*h - b^2*c^2*e*f*h^2 + 2*a*b*c*d*e*f*h^2 - a^2*d^2*e*f*h^2                                                            )*y2*y7 + '
+        chk += '(-b^2*c^2*f^2*h^2 + 2*a*b*c*d*f^2*h^2 - a^2*d^2*f^2*h^2                                                                                                                    )*y6*y7 + '
+        chk += '(-b^2*c^2*e*f*g^2 + 2*a*b*c*d*e*f*g^2 - a^2*d^2*e*f*g^2 - b^2*c^2*e^2*g*h + 2*a*b*c*d*e^2*g*h - a^2*d^2*e^2*g*h                                                            )*y1*y8 + '
+        chk += '(-b^2*c^2*e^2*g^2 + 2*a*b*c*d*e^2*g^2 - a^2*d^2*e^2*g^2                                                                                                                    )*y5*y8   '
+
+        assert pol.subs( dct ) == ring( chk )
+
+
     def test__get_aut_P8__SO2xID( self ):
         chk_mat = ''
         chk_mat += '['
@@ -393,4 +432,5 @@ if __name__ == '__main__':
     # TestClassDSegre().test__get_aut_P8__action_of_involution()
     # TestClassDSegre().test__get_invariant_qf__5678_SO2xSO2()
     # TestClassDSegre().test__get_c_lst_lst_lst()
-    TestClassDSegre().test__to_str()
+    # TestClassDSegre().test__to_str()
+    TestClassDSegre().test__get_aut_P8__moduli()
