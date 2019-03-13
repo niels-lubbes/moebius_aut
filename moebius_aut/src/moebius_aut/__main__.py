@@ -150,7 +150,7 @@ def usecase__invariant_quadratic_forms( case ):
 
     elif case == '243ss':
         descr = ''' 
-                This example shows that the horn cyclide in S^3 admits a 
+                This example shows that the spindle cyclide in S^3 admits a 
                 2-dimensional family of Moebius automorphisms.
                 '''
         infoG = 'SO(2) x SX(1): [ s + e, e + s ]'
@@ -160,7 +160,7 @@ def usecase__invariant_quadratic_forms( case ):
 
     elif case == '243st':
         descr = ''' 
-                This example shows that the spindle cyclide in S^3 admits a 
+                This example shows that the horn cyclide in S^3 admits a 
                 2-dimensional family of Moebius automorphisms.
                 '''
         infoG = 'SO(2) x SE(1): [ s + e, e + t ]'
@@ -375,13 +375,13 @@ def usecase__horn_and_spindle_cyclides():
     parametrization determined by the following lattice 
     polygons:  
     
-        [  *  ]        [  *  ]
-        [* * *]        [  *  ]
-        [  *  ]        [* * *]
+        [  *  ]           [  *  ]
+        [* * *]           [  *  ]
+        [  *  ]           [* * *]
         
-     horn cyclide    spindle cyclide   
-     leftright       leftright  
-     (2,4,3)         (2,4,3)
+     spindle cyclide    horn cyclide   
+     leftright          leftright  
+     (2,4,3)            (2,4,3)
        
     and 'leftright' involution act as a modular involution
     with vertical symmetry axis. We use the following numbering 
@@ -393,7 +393,7 @@ def usecase__horn_and_spindle_cyclides():
     '''
     if True:
         #
-        # G-invariant quadratic forms for horn cyclide
+        # G-invariant quadratic forms for spindle cyclide
         # (see usecase__invariant_quadratic_forms('243ss')):
         #
         # x0^2 - x3*x4
@@ -441,7 +441,7 @@ def usecase__horn_and_spindle_cyclides():
         eqn = str( prj_lst[0].subs( {y0:1} ) ).replace( 'y1', 'x' ).replace( 'y2', 'y' ).replace( 'y3', 'z' )
 
         MATools.p( 80 * '-' )
-        MATools.p( 'HORN CYCLIDE' )
+        MATools.p( 'SPINDLE CYCLIDE' )
         MATools.p( 80 * '-' )
         MATools.p( 'We define a projective automorphism m:P^4--->P^4' )
         MATools.p( '\t a   = 1/sqrt(2)' )
@@ -465,7 +465,7 @@ def usecase__horn_and_spindle_cyclides():
 
     if True:
         #
-        # G-invariant quadratic forms for spindle cyclides
+        # G-invariant quadratic forms for horn cyclides
         # (see usecase__invariant_quadratic_forms('243st')):
         #
         # x0^2 - x3*x4
@@ -503,7 +503,7 @@ def usecase__horn_and_spindle_cyclides():
 
 
         MATools.p( 80 * '-' )
-        MATools.p( 'SPINDLE CYCLIDE' )
+        MATools.p( 'HORN CYCLIDE' )
         MATools.p( 80 * '-' )
         MATools.p( 'We define a projective automorphism m:P^4--->P^4' )
         MATools.p( '\t a   = 1/sqrt(2)' )
