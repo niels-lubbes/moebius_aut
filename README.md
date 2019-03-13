@@ -167,14 +167,14 @@ at least circles through each point
     exc_idx_lst = [5,8]                        exc_idx_lst = [1,3,5]                        
     involution='leftright'                     involution in ['identity','diagonal']        
 
-    -= ring cyclide =-                         -= horn cyclide =-        
+    -= ring cyclide =-                         -= spindle cyclide =-        
         [  *  ]                                    [  *  ]               
         [* * *]                                    [* * *]               
         [  *  ]                                    [  *  ]               
     exc_idx_lst = [5,6,7,8]                    exc_idx_lst = [5,6,7,8]   
     involution='rotate'                        involution='leftright'    
 
-    -= spindle cyclide =-                      -= 2-sphere =-               
+    -= horn cyclide =-                         -= 2-sphere =-               
         [  *  ]                                    [     ]              
         [  *  ]                                    [* *  ]              
         [* * *]                                    [* *  ]              
@@ -249,7 +249,7 @@ two real points.
 
 We show in this example how to compute quadratic forms in the ideal of a linear projection of the 
 double Segre surface that are invariant under the group SO(2)xSO(2). Moreover, we assume that 
-the real structure is non-trivial (see next section for more info).
+the real structure is non-trivial.
 
 ```python
 from moebius_aut.class_dsegre import DSegre
