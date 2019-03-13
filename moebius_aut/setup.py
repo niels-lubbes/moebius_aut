@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup( 
     name = 'moebius_aut',
-    version = '0',
+    version = '1',
     description = 'Computing Moebius automorphisms of surfaces',
     classifiers = [
         'Development Status :: 3 - Alpha',
